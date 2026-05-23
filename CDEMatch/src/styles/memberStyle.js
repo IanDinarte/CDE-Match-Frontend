@@ -32,7 +32,7 @@ export const memberStyle = StyleSheet.create({
     paddingBottom: 40, 
   },
   headerRow: { 
-    paddingTop: 30,
+    paddingTop: 35,
     paddingBottom: 15,
     paddingLeft: 20,
     flexDirection: "row", 

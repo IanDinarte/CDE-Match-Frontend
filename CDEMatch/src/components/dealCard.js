@@ -12,7 +12,7 @@ import {
 import { dealListStyle } from "../styles/dealListStyle";
 
 export function DealCard({ item }) {
-  const initial = item.userName ? item.userName.charAt(0).toUpperCase() : "U";
+  const initial = item.owner ? item.owner.name.charAt(0).toUpperCase() : "U";
 
   return (
     <View style={dealListStyle.card}>
@@ -23,7 +23,7 @@ export function DealCard({ item }) {
           </View>
           <View>
             <Text style={dealListStyle.userName}>
-              {item.userName || "Utilizador"}
+              {item.owner.name || "Utilizador"}
             </Text>
           </View>
         </View>

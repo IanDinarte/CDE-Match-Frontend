@@ -39,6 +39,6 @@ export default function MyProfileScreen({ route }) {
   }
 
   return (
-    <ProfileTemplate member={member} isOwnProfile={true} onEditPress={() => consoleLog("abrir tela de edição")}/>
+    <ProfileTemplate member={member} isOwnProfile={true} onEditPress={() => console.log("abrir tela de edição")}/>
   );
 }
