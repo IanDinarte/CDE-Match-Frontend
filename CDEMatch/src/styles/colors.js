@@ -1,0 +1,14 @@
+export const colors = {
+  primary: "#BF9955",
+  background: "#182735",
+  cardBackground: "#101D29",
+  textPrimary: "#EEEEEE",
+  textSecondary: "#BF9955",
+  textTertiary: "#C8C8C8",
+  border: "#967841",
+  searchBackground: "#EEEEEE",
+  avatarBackground: "#C3C3C3",
+  actionButton: "#967841",
+  inputBackground: "#D9D9D9",
+  gray: "#8B949E",
+};

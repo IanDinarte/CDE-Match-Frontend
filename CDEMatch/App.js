@@ -1,20 +1,42 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar } from "expo-status-bar";
+import { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 
+// importar screens da app
+import DealListScreen from "./src/screens/deal/dealList.js";
+import LoginScreen from "./src/screens/loginScreen.js";
+import MemberListScreen from "./src/screens/member/memberList.js";
+
+import TabNavigator from "./src/routes/tabNavigator.js";
+
+const Stack = createStackNavigator();
+
+/**
+ * NavigationContainer: engloba toda a estrutura de rotas da app
+ * initialRouteName: tela principal que aparece quando abre a app
+ * screenOptions={{ headerShown: false }} esconder a barra do topo do telemovel
+ * @returns
+ */
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <StatusBar style="light" />
+
+      <Stack.Navigator
+        initialRouteName="Login"
+        screenOptions={{ headerShown: false }}
+      >
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="MainApp" component={TabNavigator} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
