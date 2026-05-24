@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Platform,
   KeyboardAvoidingView,
-  SafeAreaView,
   TextInput,
   Image,
   Alert,
@@ -16,6 +15,7 @@ import api from "../services/api";
 import { globalStyles } from "../styles/globalStyles";
 import { loginStyle } from "../styles/loginStyle";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -53,7 +53,7 @@ export default function LoginScreen({ navigation }) {
   return (
     <SafeAreaView style={loginStyle.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={loginStyle.keyboardView}
       >
         <View style={loginStyle.content}>

@@ -11,7 +11,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
 // importar screens da app
-import DealListScreen from "./src/screens/deal/dealList.js";
 import LoginScreen from "./src/screens/loginScreen.js";
 import MemberListScreen from "./src/screens/member/memberList.js";
 

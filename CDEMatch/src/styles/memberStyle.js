@@ -23,210 +23,162 @@ export const memberStyle = StyleSheet.create({
     marginVertical: 4,
   },
 
-  container: { 
-    flex: 1, 
-    backgroundColor: colors.background, 
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
   },
-  contentContainer: { 
-    padding: 20, 
-    paddingBottom: 40, 
+  contentContainer: {
+    padding: 20,
+    paddingBottom: 40,
   },
-  headerRow: { 
+  headerRow: {
     paddingTop: 35,
     paddingBottom: 15,
     paddingLeft: 20,
-    flexDirection: "row", 
-    alignItems: "center",  
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: colors.cardBackground,
   },
-  avatarCircle: { 
+  avatarCircle: {
     // marginTop: 25,
-    width: 80, 
-    height: 80, 
-    borderRadius: 50, 
-    backgroundColor: "#C4C4C4", 
-    justifyContent: "center", 
-    alignItems: "center", 
+    width: 80,
+    height: 80,
+    borderRadius: 50,
+    backgroundColor: "#C4C4C4",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  avatarText: { 
-    fontSize: 28, 
-    fontWeight: "bold", 
-    color: colors.cardBackground, 
+  avatarText: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: colors.cardBackground,
   },
-  headerInfo: { 
+  headerInfo: {
     // paddingTop: 25,
-    marginLeft: 15, 
+    marginLeft: 15,
   },
-  nameText: { 
-    fontSize: 20, 
-    fontWeight: "bold", 
-    color: colors.textSecondary || "#E6C687", 
+  nameText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: colors.textSecondary || "#E6C687",
   },
-  locationText: { 
-    fontSize: 16, 
-    color: colors.textSecondary || "#8A94A6", 
-    marginTop: 4, 
+  locationText: {
+    fontSize: 16,
+    color: colors.textSecondary || "#8A94A6",
+    marginTop: 4,
   },
-  descContainer: { 
-    margin: 15, 
+  membershipText: {
+    fontSize: 18,
+    color: colors.textSecondary,
+    fontWeight: "bold",
+    marginBottom: 4,
   },
-  descText: { 
-    fontSize: 17, 
-    color: colors.textPrimary, 
-    lineHeight: 22, 
-    marginBottom: 15, 
+  descContainer: {
+    marginTop: 10,
+    marginHorizontal: 15,
+    marginBottom: 15,
   },
-  contactsTitle: { 
-    fontSize: 16, 
-    color: colors.gray || "#566275", 
-    fontWeight: "bold", 
-    marginBottom: 5, 
+  descText: {
+    fontSize: 17,
+    color: colors.textPrimary,
+    lineHeight: 22,
+    marginBottom: 10,
   },
-  contactItem: { 
-    fontSize: 15, 
-    color: "#FFFFFF", 
-    marginBottom: 4, 
+  contactsTitle: {
+    fontSize: 16,
+    color: colors.gray || "#566275",
+    fontWeight: "bold",
+    marginBottom: 5,
   },
-  actionButton: { 
-    flexDirection: "row", 
-    backgroundColor: colors.actionButton, 
-    alignSelf: "flex-start", 
-    paddingVertical: 6, 
-    paddingHorizontal: 15, 
-    borderRadius: 50, 
-    alignItems: "center", 
-    marginLeft: 15, 
-    marginBottom: 15, 
+  contactItem: {
+    fontSize: 15,
+    color: colors.textPrimary,
+    fontWeight: "light",
+    marginBottom: 2,
   },
-  actionButtonText: { 
-    color: colors.textPrimary, 
-    fontWeight: "medium", 
-    fontSize: 17, 
+  website: {
+    fontSize: 15,
+    color: colors.textSecondary,
+    fontWeight: "medium",
+    marginBottom: 2,
+    textDecorationLine: "underline"
   },
-  tabBar: { 
-    flexDirection: "row", 
+  actionButton: {
+    flexDirection: "row",
+    backgroundColor: colors.actionButton,
+    alignSelf: "flex-start",
+    paddingVertical: 6,
+    paddingHorizontal: 15,
+    borderRadius: 50,
+    alignItems: "center",
+    marginLeft: 15,
+    marginBottom: 15,
+  },
+  actionButtonText: {
+    color: colors.textPrimary,
+    fontWeight: "medium",
+    fontSize: 17,
+  },
+  tabBar: {
+    flexDirection: "row",
     backgroundColor: colors.cardBackground,
-    marginBottom: 15, 
+    marginBottom: 15,
   },
-  tabButton: { 
-    flex: 1, 
-    paddingVertical: 12, 
-    alignItems: "center", 
+  tabButton: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: "center",
   },
-  tabButtonActive: { 
-    borderBottomWidth: 3, 
-    borderBottomColor: colors.primary || "#A88A44", 
+  tabButtonActive: {
+    borderBottomWidth: 3,
+    borderBottomColor: colors.primary || "#A88A44",
   },
-  tabButtonText: { 
-    color: colors.textSecondary || "#566275", 
-    fontSize: 16, 
-    fontWeight: "bold", 
+  tabButtonText: {
+    color: colors.textSecondary || "#566275",
+    fontSize: 16,
+    fontWeight: "bold",
   },
-  tabActiveText: { 
-    color: colors.primary || "#A88A44", 
+  tabActiveText: {
+    color: colors.primary || "#A88A44",
   },
-  dynamicContent: { 
-    flex: 1, 
+  dynamicContent: {
+    flex: 1,
   },
-  
+
   // empresas
-  cardBusiness: { 
-    flexDirection: "row", 
-    backgroundColor: colors.cardBackground || "#131C26", 
-    padding: 15, 
-    borderRadius: 15, 
-    marginBottom: 12, 
+  cardBusiness: {
+    flexDirection: "row",
+    backgroundColor: colors.cardBackground || "#131C26",
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 12,
     marginHorizontal: 12,
-    alignItems: "center", 
+    alignItems: "center",
   },
-  logoPlaceholder: { 
-    width: 50, 
-    height: 50, 
-    borderRadius: 25, 
-    backgroundColor: "#1A2433", 
-    justifyContent: "center", 
-    alignItems: "center", 
+  logoPlaceholder: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#1A2433",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  cardInfo: { 
-    marginLeft: 15, 
-    flex: 1, 
+  cardInfo: {
+    marginLeft: 15,
+    flex: 1,
   },
-  cardTitle: { 
-    color: colors.textPrimary, 
-    fontSize: 16, 
-    fontWeight: "bold", 
+  cardTitle: {
+    color: colors.textPrimary,
+    fontSize: 16,
+    fontWeight: "bold",
   },
-  roleText: { 
-    color: colors.textPrimary || "#8A94A6", 
-    fontWeight: "normal", 
+  roleText: {
+    color: colors.textPrimary || "#8A94A6",
+    fontWeight: "normal",
   },
-  cardSub: { 
-    color: colors.textPrimary || "#8A94A6", 
-    fontSize: 13, 
-    marginTop: 4, 
-  },
-  
-  // deals
-  cardDeal: { 
-    backgroundColor: colors.cardBackground, 
-    padding: 15, 
-    borderRadius: 15, 
-    marginHorizontal: 12,
-    marginBottom: 12, 
-  },
-  dealHeader: { 
-    flexDirection: "row", 
-    alignItems: "center", 
-    marginBottom: 12, 
-  },
-  miniAvatar: { 
-    width: 40, 
-    height: 40, 
-    borderRadius: 20, 
-    backgroundColor: "#C4C4C4", 
-    justifyContent: "center", 
-    alignItems: "center", 
-    marginRight: 10, 
-  },
-  miniAvatarText: {
-    fontSize: 14, 
-    fontWeight: "bold", 
-    color: colors.background, 
-  },
-  dealAuthor: { 
-    color: colors.textSecondary, 
-    fontWeight: "bold", 
-    fontSize: 18, 
-  },
-  dealRole: { 
-    color: colors.textSecondary || "#8A94A6", 
-    fontSize: 11, 
-  },
-  dealTitle: { 
-    color: colors.textPrimary, 
-    fontSize: 16, 
-    fontWeight: "bold", 
-    marginBottom: 6, 
-  },
-  dealBody: { 
-    color: colors.textTertiary, 
-    fontSize: 14, 
-    lineHeight: 18, 
-    marginBottom: 15, 
-  },
-  dealActions: { 
-    flexDirection: "row", 
-    justifyContent: "space-between", 
-  },
-  btnDeal: { 
-    backgroundColor: colors.actionButton, 
-    paddingVertical: 6, 
-    paddingHorizontal: 16, 
-    borderRadius: 50, 
-  },
-  btnDealText: { 
-    color: colors.textPrimary, 
-    fontWeight: "medium", 
-    fontSize: 17, 
+  cardSub: {
+    color: colors.textPrimary || "#8A94A6",
+    fontSize: 13,
+    marginTop: 4,
   },
 });

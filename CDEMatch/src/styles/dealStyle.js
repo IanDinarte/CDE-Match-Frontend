@@ -1,10 +1,11 @@
 import { StyleSheet } from "react-native";
 import { colors } from "./colors";
 
-export const dealListStyle = StyleSheet.create({
+export const dealStyle = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 0,
     backgroundColor: colors.background,
+    paddingBottom: 20,
   },
   searchBarContainer: {
     marginTop: 20,
@@ -68,19 +69,23 @@ export const dealListStyle = StyleSheet.create({
     fontSize: 14,
   },
   optionsIcon: {
-    color: colors.iconSecondary,
+    color: colors.textPrimary,
     fontSize: 24,
   },
-  offerTitle: {
+  dealTitle: {
     color: colors.textPrimary,
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 8,
+    // marginBottom: 8,
   },
-  offerDescription: {
+  dealInfo: {
+    color: colors.textPrimary,
+  },
+  dealDescription: {
     color: colors.textTertiary,
     fontSize: 14,
     lineHeight: 20,
+    marginTop: 8,
     marginBottom: 16,
   },
   cardActions: {
@@ -90,14 +95,63 @@ export const dealListStyle = StyleSheet.create({
   actionButton: {
     flex: 1,
     backgroundColor: colors.actionButton,
-    borderRadius: 20,
-    paddingVertical: 10,
+    borderRadius: 50,
+    padding: 10,
     alignItems: "center",
-    marginHorizontal: 4,
+    marginHorizontal: 5,
   },
   actionButtonText: {
     color: colors.textPrimary,
     fontSize: 16,
+    fontWeight: "medium",
+  },
+
+  //details
+  detailsContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+    paddingBottom: 20,
+  },
+  detailsHeaderContainer: {
+    backgroundColor: colors.cardBackground,
+    paddingTop: 30,
+    paddingBottom: 10,
+    paddingHorizontal: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  detailTitle: {
+    color: colors.textSecondary,
+    fontSize: 25,
     fontWeight: "bold",
   },
+  detailAvatar: {
+    width: 70,
+    height: 70,
+    borderRadius: 50,
+    backgroundColor: colors.avatarBackground,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  detailAvatarText: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: colors.background,
+  },
+  detailName: {
+    color: colors.textSecondary,
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  detailInfo: {
+    color: colors.textPrimary,
+    fontSize: 18,
+  },
+  detailDescription: {
+    color: colors.textPrimary,
+    fontSize: 16,
+    marginTop: 8,
+    marginBottom: 16,
+  }
 });

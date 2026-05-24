@@ -9,90 +9,61 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from "react-native";
-import { dealListStyle } from "../styles/dealListStyle";
+import { Ionicons } from "@expo/vector-icons";
+import { dealStyle } from "../styles/dealStyle";
+import { useNavigation } from "@react-navigation/native";
 
 export function DealCard({ item }) {
+  const navigation = useNavigation();
   const initial = item.owner ? item.owner.name.charAt(0).toUpperCase() : "U";
 
   return (
-    <View style={dealListStyle.card}>
-      <View style={dealListStyle.cardHeader}>
-        <View style={dealListStyle.headerLeft}>
-          <View style={dealListStyle.avatar}>
-            <Text style={dealListStyle.avatarText}>{initial}</Text>
+    <View style={dealStyle.card}>
+      <View style={dealStyle.cardHeader}>
+        <TouchableOpacity
+          style={dealStyle.headerLeft}
+          onPress={() =>
+            navigation.navigate("MemberProfile", { id: item.owner?._id })
+          }
+        >
+          <View style={dealStyle.avatar}>
+            <Text style={dealStyle.avatarText}>{initial}</Text>
           </View>
           <View>
-            <Text style={dealListStyle.userName}>
+            <Text style={dealStyle.userName}>
               {item.owner.name || "Utilizador"}
             </Text>
           </View>
-        </View>
+        </TouchableOpacity>
         <TouchableOpacity>
-          <Text style={dealListStyle.optionsIcon}>⋮</Text>
+          <Text style={dealStyle.optionsIcon}>⋮</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Conteúdo - Ajusta os nomes das propriedades conforme o teu Schema de Deals */}
-      <Text style={dealListStyle.offerTitle}>
-        {item.title || item.offerTitle}
+      <Text style={dealStyle.dealTitle}>{item.title}</Text>
+      <Text style={dealStyle.dealInfo}>
+        {item.type}, {item.area}
       </Text>
-      <Text style={dealListStyle.offerDescription}>
-        {item.description || item.offerDescription}
-      </Text>
+      <Text style={dealStyle.dealInfo}>{item.price} €</Text>
+      <Text style={dealStyle.dealDescription}>{item.description}</Text>
 
-      {/* Botões de Ação */}
-      <View style={dealListStyle.cardActions}>
-        <TouchableOpacity style={dealListStyle.actionButton}>
-          <Text style={dealListStyle.actionButtonText}>Match</Text>
+      <View style={dealStyle.cardActions}>
+        <TouchableOpacity style={dealStyle.actionButton}>
+          <Ionicons name="heart-outline" size={22} color="#EEEEEE" />
         </TouchableOpacity>
-        <TouchableOpacity style={dealListStyle.actionButton}>
-          <Text style={dealListStyle.actionButtonText}>Sugerir</Text>
+        <TouchableOpacity
+          style={dealStyle.actionButton}
+          onPress={() => navigation.navigate("DealDetails", { id: item._id })}
+        >
+          <Ionicons name="eye-outline" size={22} color="#EEEEEE" />
         </TouchableOpacity>
-        <TouchableOpacity style={dealListStyle.actionButton}>
-          <Text style={dealListStyle.actionButtonText}>Favoritar</Text>
+        <TouchableOpacity style={dealStyle.actionButton}>
+          <Ionicons name="send-outline" size={22} color="#EEEEEE" />
+        </TouchableOpacity>
+        <TouchableOpacity style={dealStyle.actionButton}>
+          <Ionicons name="star-outline" size={22} color="#EEEEEE" />
         </TouchableOpacity>
       </View>
     </View>
   );
-}
-
-{
-  /* <View style={memberStyle.cardDeal}>
-              <View style={memberStyle.dealHeader}>
-                <View style={memberStyle.miniAvatar}>
-                  <Text style={memberStyle.miniAvatarText}>
-                    {initialLetter}
-                  </Text>
-                </View>
-                <View>
-                  <Text style={memberStyle.dealAuthor}>
-                    {member?.name?.split(" ")[0]}
-                  </Text>
-                </View>
-                <Ionicons
-                  name="ellipsis-vertical"
-                  size={20}
-                  color="#FFF"
-                  style={{ marginLeft: "auto" }}
-                />
-              </View>
-
-              <Text style={memberStyle.dealTitle}>Titulo da oferta</Text>
-              <Text style={memberStyle.dealBody}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor.
-              </Text>
-
-              <View style={memberStyle.dealActions}>
-                <TouchableOpacity style={memberStyle.btnDeal}>
-                  <Text style={memberStyle.btnDealText}>Match</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={memberStyle.btnDeal}>
-                  <Text style={memberStyle.btnDealText}>Sugerir</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={memberStyle.btnDeal}>
-                  <Text style={memberStyle.btnDealText}>Favoritar</Text>
-                </TouchableOpacity>
-              </View>
-            </View> */
 }

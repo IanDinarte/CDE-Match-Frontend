@@ -11,7 +11,8 @@ export const loginStyle = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
+    marginTop: 100,
     paddingHorizontal: 20,
   },
   headerContainer: {

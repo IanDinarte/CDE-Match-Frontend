@@ -12,7 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { memberStyle } from "../styles/memberStyle";
 import { BusinessCard } from "./businessCard";
 import { DealCard } from "./dealCard";
-import { dealListStyle } from "../styles/dealListStyle";
+import { dealStyle } from "../styles/dealStyle";
 
 export default function ProfileTemplate({ member, isOwnProfile, onEditPress }) {
   const [activeTab, setActiveTab] = useState("empresas");
@@ -38,24 +38,48 @@ export default function ProfileTemplate({ member, isOwnProfile, onEditPress }) {
       </View>
 
       <View style={memberStyle.descContainer}>
-        <Text style={memberStyle.descText}>{member?.description || " "}</Text>
+        {isOwnProfile ? (
+          <Text style={memberStyle.membershipText}>
+            Seu Plano: {member?.membership}
+          </Text>
+        ) : null}
+        <Text style={memberStyle.descText}>{member?.description || ""}</Text>
 
-        <Text style={memberStyle.contactsTitle}>Contatos:</Text>
+        {/* <Text style={memberStyle.contactsTitle}>Contatos:</Text> */}
+        {member?.email?.confidential === false ? (
+          <Text style={memberStyle.contactItem}>
+            Email: {member?.email?.value}
+          </Text>
+        ) : null}
+
+        {member?.phone?.confidential === false ? (
+          <Text style={memberStyle.contactItem}>
+            Telemóvel: {member?.phone?.value}
+          </Text>
+        ) : null}
+
+        <View>
+          {member?.websites && member.websites.length > 0
+            ? member.websites.map((item, index) => (
+                <Text key={index} style={memberStyle.website}>
+                  {item.name}
+                </Text>
+              ))
+            : null}
+        </View>
       </View>
 
-      <TouchableOpacity
-        style={memberStyle.actionButton}
-        onPress={isOwnProfile ? onEditPress : () => console.log("Ação externa")}
-      >
-        <Text style={memberStyle.actionButtonText}>
-          {isOwnProfile ? "Editar Perfil " : "Contactar "}
-        </Text>
-        <Ionicons
-          name={isOwnProfile ? "pencil" : "chatbubble-ellipses"}
-          size={16}
-          color="#EEEEEE"
-        />
-      </TouchableOpacity>
+      {isOwnProfile ? (
+        <TouchableOpacity
+          style={memberStyle.actionButton}
+          onPress={
+            isOwnProfile ? onEditPress : () => console.log("Ação externa")
+          }
+        >
+          <Text style={memberStyle.actionButtonText}>Editar Perfil </Text>
+          <Ionicons name="pencil" size={16} color="#EEEEEE" />
+        </TouchableOpacity>
+      ) : null}
 
       <View style={memberStyle.tabBar}>
         <TouchableOpacity
@@ -101,13 +125,15 @@ export default function ProfileTemplate({ member, isOwnProfile, onEditPress }) {
                 <BusinessCard key={item._id} item={item} />
               ))
             ) : (
-              <Text style={{ color: "#8A94A6", textAlign: "center", marginTop: 10 }}>
+              <Text
+                style={{ color: "#8A94A6", textAlign: "center", marginTop: 10 }}
+              >
                 Esse Membro não possui Empresas
               </Text>
             )}
           </View>
         ) : (
-          <View style={dealListStyle.listContent}>
+          <View style={dealStyle.listContent}>
             {member?.deals && member.deals.length > 0 ? (
               member.deals.map((item) => (
                 <DealCard key={item._id} item={item} />
