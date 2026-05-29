@@ -1,18 +1,21 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { memberStyle } from "../styles/memberStyle";
 
 export function BusinessCard({ item }) {
   return (
     <View style={memberStyle.cardBusiness}>
-      <View>
-        <Ionicons
-          name={"business"}
-          size={40}
-          color="#A88A44"
-        />
-      </View>
+      {item.logo ? (
+        <Image
+          source={{ uri: item.logo }}
+          style={memberStyle.businessLogo}
+        ></Image>
+      ) : (
+        <View>
+          <Ionicons name={"business"} size={40} color="#A88A44" />
+        </View>
+      )}
       <View style={memberStyle.cardInfo}>
         <Text style={memberStyle.cardTitle}>
           {item.name}, <Text style={memberStyle.roleText}>{item.role}</Text>

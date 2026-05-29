@@ -39,6 +39,12 @@ export const memberStyle = StyleSheet.create({
     alignItems: "center",
     backgroundColor: colors.cardBackground,
   },
+  avatarImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 50,
+    backgroundColor: colors.cardBackground,
+  },
   avatarCircle: {
     // marginTop: 25,
     width: 80,
@@ -181,4 +187,8 @@ export const memberStyle = StyleSheet.create({
     fontSize: 13,
     marginTop: 4,
   },
+  businessLogo: {
+    height: 50,
+    width: 50
+  }
 });

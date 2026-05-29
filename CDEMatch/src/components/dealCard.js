@@ -8,6 +8,7 @@ import {
   TextInput,
   SafeAreaView,
   ActivityIndicator,
+  Image
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { dealStyle } from "../styles/dealStyle";
@@ -26,9 +27,17 @@ export function DealCard({ item }) {
             navigation.navigate("MemberProfile", { id: item.owner?._id })
           }
         >
-          <View style={dealStyle.avatar}>
-            <Text style={dealStyle.avatarText}>{initial}</Text>
-          </View>
+          {item.owner?.profilePicture ? (
+            <Image
+              source={{ uri: item.owner?.profilePicture }}
+              style={dealStyle.avatar}
+            ></Image>
+          ) : (
+            <View style={dealStyle.avatar}>
+              <Text style={dealStyle.avatarText}>{initial}</Text>
+            </View>
+          )}
+
           <View>
             <Text style={dealStyle.userName}>
               {item.owner.name || "Utilizador"}

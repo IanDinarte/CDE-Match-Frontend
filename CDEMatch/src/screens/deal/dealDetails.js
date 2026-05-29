@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   ScrollView,
+  Image
 } from "react-native";
 import api from "../../services/api";
 import { Ionicons } from "@expo/vector-icons";
@@ -79,9 +80,18 @@ export default function DealDetailsScreen({ route }) {
                 navigation.navigate("MemberProfile", { id: deal.owner?._id })
               }
             >
-              <View style={dealStyle.detailAvatar}>
-                <Text style={dealStyle.detailAvatarText}>{initialLetter}</Text>
-              </View>
+              {deal.owner?.profilePicture ? (
+                <Image
+                  source={{ uri: deal.owner?.profilePicture }}
+                  style={dealStyle.avatar}
+                ></Image>
+              ) : (
+                <View style={dealStyle.detailAvatar}>
+                  <Text style={dealStyle.detailAvatarText}>
+                    {initialLetter}
+                  </Text>
+                </View>
+              )}
               <View>
                 <Text style={dealStyle.detailName}>{ownerName}</Text>
               </View>

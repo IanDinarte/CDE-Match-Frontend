@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   FlatList,
+  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { memberStyle } from "../styles/memberStyle";
@@ -24,9 +25,17 @@ export default function ProfileTemplate({ member, isOwnProfile, onEditPress }) {
   return (
     <ScrollView style={memberStyle.container}>
       <View style={memberStyle.headerRow}>
-        <View style={memberStyle.avatarCircle}>
-          <Text style={memberStyle.avatarText}>{initialLetter}</Text>
-        </View>
+        {member.profilePicture ? (
+          <Image
+            source={{ uri: member.profilePicture }}
+            style={memberStyle.avatarImage}
+          ></Image>
+        ) : (
+          <View style={memberStyle.avatarCircle}>
+            <Text style={memberStyle.avatarText}>{initialLetter}</Text>
+          </View>
+        )}
+
         <View style={memberStyle.headerInfo}>
           <Text style={memberStyle.nameText}>
             {member?.name || "Nome do Membro"}

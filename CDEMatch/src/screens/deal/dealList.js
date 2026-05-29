@@ -20,11 +20,24 @@ export default function DealListScreen() {
   const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const fetchDeals = (query = "") => {
+  const [selectedType, setSelectedType] = useState("Todos");
+  const [selectedArea, setSelectedArea] = useState("Todas");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+
+  const fetchDeals = () => {
     setLoading(true);
 
+    const params = new URLSearchParams({
+      title: searchText,
+      type: selectedType,
+      area: selectedArea,
+      minPrice: minPrice,
+      maxPrice: maxPrice,
+    }).toString();
+
     api
-      .get(`api/deal?title=${query}`)
+      .get(`api/deal?${params}`)
       .then((res) => {
         setDeals(res.data || []);
         setLoading(false);
@@ -37,7 +50,7 @@ export default function DealListScreen() {
 
   useEffect(() => {
     fetchDeals(searchText);
-  }, [searchText]);
+  }, [searchText, selectedType, selectedArea, minPrice, maxPrice]);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -45,7 +58,7 @@ export default function DealListScreen() {
         <View style={dealStyle.searchBarContainer}>
           <TextInput
             style={dealStyle.searchBar}
-            placeholder="Procurar Negócio"
+            placeholder="Procurar Negócio por Titulo ou Membro"
             value={searchText}
             onChangeText={(text) => setSearchText(text)}
             clearButtonMode="while-editing"
@@ -61,7 +74,7 @@ export default function DealListScreen() {
         ) : (
           <FlatList
             data={deals}
-            keyExtractor={(item) => item._id} // Usando o ID único do MongoDB
+            keyExtractor={(item) => item._id}
             renderItem={({ item }) => <DealCard item={item} />}
             contentContainerStyle={dealStyle.listContent}
             ListEmptyComponent={
