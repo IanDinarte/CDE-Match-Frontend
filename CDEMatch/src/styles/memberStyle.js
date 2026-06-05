@@ -107,16 +107,16 @@ export const memberStyle = StyleSheet.create({
     color: colors.textSecondary,
     fontWeight: "medium",
     marginBottom: 2,
-    textDecorationLine: "underline"
+    textDecorationLine: "underline",
   },
   actionButton: {
     flexDirection: "row",
     backgroundColor: colors.actionButton,
     alignSelf: "flex-start",
+    alignItems: "center",
     paddingVertical: 6,
     paddingHorizontal: 15,
     borderRadius: 50,
-    alignItems: "center",
     marginLeft: 15,
     marginBottom: 15,
   },
@@ -188,7 +188,8 @@ export const memberStyle = StyleSheet.create({
     marginTop: 4,
   },
   businessLogo: {
-    height: 50,
-    width: 50
-  }
+    height: 60,
+    width: 60,
+    borderRadius: 15,
+  },
 });

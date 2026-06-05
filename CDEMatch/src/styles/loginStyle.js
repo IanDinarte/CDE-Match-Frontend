@@ -12,7 +12,7 @@ export const loginStyle = StyleSheet.create({
   content: {
     flex: 1,
     justifyContent: "flex-start",
-    marginTop: 100,
+    marginTop: 70,
     paddingHorizontal: 20,
   },
   headerContainer: {
@@ -58,10 +58,10 @@ export const loginStyle = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
     marginBottom: 15,
-    marginHorizontal: 30, // Faz o botão um pouco mais estreito que os inputs, como na imagem
+    marginHorizontal: 30, 
   },
   loginButtonText: {
-    color: colors.cardBackground, // Texto escuro para contrastar com o ouro
+    color: colors.cardBackground, 
     fontSize: 18,
     fontWeight: "medium",
   },
@@ -77,7 +77,7 @@ export const loginStyle = StyleSheet.create({
     paddingBottom: Platform.OS === "ios" ? 20 : 15,
   },
   footerLogo: {
-    width: 150, // Define a largura da imagem
-    height: 150, // Define a altura da imagem
+    width: 150, 
+    height: 150,
   },
 });

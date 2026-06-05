@@ -14,14 +14,16 @@ import { useNavigation } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import api from "../services/api";
 
-export function DealCard({ item }) {
+export function SuggestedDealCard({ item, onActionComplete }) {
   const [modalActive, setModalActive] = useState(false);
   const [members, setMembers] = useState([]);
   const [suggestedMemberIds, setSuggestedMemberIds] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const navigation = useNavigation();
-  const initial = item.owner ? item.owner.name.charAt(0).toUpperCase() : "M";
+  const initial = item.deal.owner
+    ? item.deal.owner.name.charAt(0).toUpperCase()
+    : "U";
 
   const loadMembers = () => {
     setModalActive(true);
@@ -40,7 +42,7 @@ export function DealCard({ item }) {
 
   const sendSuggestion = (memberId) => {
     const suggestionData = {
-      dealId: item._id,
+      dealId: item.deal._id,
       suggestedTo: memberId,
     };
 
@@ -52,6 +54,17 @@ export function DealCard({ item }) {
         }
       })
       .catch((error) => console.log(error.message));
+  };
+
+  const rejectSuggestion = () => {
+    api
+      .delete(`api/deal/suggestion/${item._id}`)
+      .then((res) => {
+        if (onActionComplete) onActionComplete();
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
   };
 
   return (
@@ -143,12 +156,12 @@ export function DealCard({ item }) {
         <TouchableOpacity
           style={dealStyle.headerLeft}
           onPress={() =>
-            navigation.navigate("MemberProfile", { id: item.owner?._id })
+            navigation.navigate("MemberProfile", { id: item.deal.owner?._id })
           }
         >
-          {item.owner?.profilePicture ? (
+          {item.deal.owner?.profilePicture ? (
             <Image
-              source={{ uri: item.owner?.profilePicture }}
+              source={{ uri: item.deal.owner?.profilePicture }}
               style={dealStyle.avatar}
             ></Image>
           ) : (
@@ -159,45 +172,51 @@ export function DealCard({ item }) {
 
           <View>
             <Text style={dealStyle.userName}>
-              {item.owner.name || "Utilizador"}
+              {item.deal.owner.name || "Utilizador"}
             </Text>
           </View>
         </TouchableOpacity>
-        {/* <TouchableOpacity>
-          <Text style={dealStyle.optionsIcon}>⋮</Text>
-        </TouchableOpacity> */}
       </View>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate("DealDetails", { id: item._id })}
+        onPress={() =>
+          navigation.navigate("DealDetails", { id: item.deal._id })
+        }
       >
-        <Text style={dealStyle.dealTitle}>{item.title}</Text>
-        <Text style={dealStyle.dealInfo}>
-          {item.type}, {item.area}
+        <Text style={dealStyle.suggestedBy}>
+          Sugerido por: {item.suggestedBy.name}
         </Text>
-        <Text style={dealStyle.dealInfo}>{item.price} €</Text>
-        <Text style={dealStyle.dealDescription}>{item.description}</Text>
+        <Text style={dealStyle.dealTitle}>{item.deal.title}</Text>
+        <Text style={dealStyle.dealInfo}>
+          {item.deal.type}, {item.deal.area}
+        </Text>
+        <Text style={dealStyle.dealInfo}>{item.deal.price} €</Text>
+        <Text style={dealStyle.dealDescription}>{item.deal.description}</Text>
       </TouchableOpacity>
 
-      <View style={dealStyle.cardActions}>
-        <TouchableOpacity style={dealStyle.actionButton}>
-          <Ionicons name="heart-outline" size={22} color="#EEEEEE" />
-        </TouchableOpacity>
-        {/* <TouchableOpacity
-          style={dealStyle.actionButton}
-          onPress={() => navigation.navigate("DealDetails", { id: item._id })}
-        >
-          <Ionicons name="eye-outline" size={22} color="#EEEEEE" />
-        </TouchableOpacity> */}
-        <TouchableOpacity
-          style={dealStyle.actionButton}
-          onPress={() => loadMembers()}
-        >
-          <Ionicons name="send-outline" size={22} color="#EEEEEE" />
-        </TouchableOpacity>
-        <TouchableOpacity style={dealStyle.actionButton}>
-          <Ionicons name="star-outline" size={22} color="#EEEEEE" />
-        </TouchableOpacity>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <View style={dealStyle.cardActions}>
+          <TouchableOpacity style={dealStyle.actionButton}>
+            <Ionicons name="heart-outline" size={22} color="#EEEEEE" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={dealStyle.actionButton}
+            onPress={() => loadMembers()}
+          >
+            <Ionicons name="send-outline" size={22} color="#EEEEEE" />
+          </TouchableOpacity>
+          <TouchableOpacity style={dealStyle.actionButton}>
+            <Ionicons name="star-outline" size={22} color="#EEEEEE" />
+          </TouchableOpacity>
+        </View>
+        <View style={dealStyle.dangerActions}>
+          <TouchableOpacity
+            style={dealStyle.dangerButton}
+            onPress={() => rejectSuggestion()}
+          >
+            <Ionicons name="trash-outline" size={22} color="#EEEEEE" />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );

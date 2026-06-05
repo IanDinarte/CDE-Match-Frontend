@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -7,8 +7,11 @@ import {
   StyleSheet,
   TextInput,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
+import Modal from "react-native-modal";
 import api from "../../services/api";
+import { Ionicons } from "@expo/vector-icons";
 import { globalStyles } from "../../styles/globalStyles";
 import { dealStyle } from "../../styles/dealStyle";
 import { DealCard } from "../../components/dealCard";
@@ -19,6 +22,8 @@ export default function DealListScreen() {
   const [deals, setDeals] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [filtersActive, setFiltersActive] = useState(false);
 
   const [selectedType, setSelectedType] = useState("Todos");
   const [selectedArea, setSelectedArea] = useState("Todas");
@@ -41,15 +46,22 @@ export default function DealListScreen() {
       .then((res) => {
         setDeals(res.data || []);
         setLoading(false);
+        setRefreshing(false);
       })
       .catch((error) => {
         console.log(error.message);
         setLoading(false);
+        setRefreshing(false);
       });
   };
 
   useEffect(() => {
-    fetchDeals(searchText);
+    fetchDeals();
+  }, [searchText, selectedType, selectedArea, minPrice, maxPrice]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchDeals();
   }, [searchText, selectedType, selectedArea, minPrice, maxPrice]);
 
   return (
@@ -58,12 +70,130 @@ export default function DealListScreen() {
         <View style={dealStyle.searchBarContainer}>
           <TextInput
             style={dealStyle.searchBar}
-            placeholder="Procurar Negócio por Titulo ou Membro"
+            placeholder="Procurar Negócio ou Membro"
             value={searchText}
             onChangeText={(text) => setSearchText(text)}
             clearButtonMode="while-editing"
           />
+          <TouchableOpacity
+            style={dealStyle.filterButton}
+            onPress={() => setFiltersActive(!filtersActive)}
+          >
+            <Ionicons name={"funnel-outline"} size={30} color={"#EEE"} />
+          </TouchableOpacity>
         </View>
+
+        <Modal
+          isVisible={filtersActive}
+          onBackdropPress={() => setFiltersActive(false)}
+          onBackButtonPress={() => setFiltersActive(false)}
+          backdropOpacity={0.6}
+          style={{ margin: 0, justifyContent: "flex-end" }}
+          animationIn="slideInUp"
+          animationOu="slideInDown"
+          useNativeDriver={true}
+        >
+          <View style={dealStyle.filterModalCard}>
+            <View style={dealStyle.modalHeader}>
+              <Text style={dealStyle.modalTitle}>Filtrar Negócios</Text>
+              <TouchableOpacity onPress={() => setFiltersActive(false)}>
+                <Ionicons name="close" size={24} color="#EEE" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={dealStyle.filterLabel}>Limite de Preço</Text>
+            <View style={dealStyle.chipContainer}>
+              <Text style={dealStyle.filterText}>de</Text>
+              <TextInput
+                style={dealStyle.priceBox}
+                placeholder="€"
+                value={minPrice}
+                onChangeText={(value) => setMinPrice(value)}
+                clearButtonMode="while-editing"
+                inputMode="decimal"
+                />
+              <Text style={dealStyle.filterText}>até</Text>
+              <TextInput
+                style={dealStyle.priceBox}
+                placeholder="€"
+                value={maxPrice}
+                onChangeText={(value) => setMaxPrice(value)}
+                clearButtonMode="while-editing"
+                inputMode="decimal"
+              />
+            </View>
+
+            <Text style={dealStyle.filterLabel}>Tipo de Negócio</Text>
+            <View style={dealStyle.chipContainer}>
+              {["Todos", "Oferta", "Procura"].map((type) => {
+                const isSelected = selectedType === type;
+                return (
+                  <TouchableOpacity
+                    key={type}
+                    style={[
+                      dealStyle.chip,
+                      isSelected && dealStyle.chipSelected,
+                    ]}
+                    onPress={() => setSelectedType(type)}
+                  >
+                    <Text
+                      style={[
+                        dealStyle.chipText,
+                        isSelected && dealStyle.chipTextSelected,
+                      ]}
+                    >
+                      {type}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <Text style={dealStyle.filterLabel}>Área de Atuação</Text>
+            <View style={dealStyle.chipContainer}>
+              {[
+                "Todas",
+                "Investimento",
+                "Venda de Ativo",
+                "Parceria Estratégica",
+                "Compra de Negócio",
+                "Financiamento",
+                "Ajuda Rápida",
+                "Procura de Perfis Chave",
+                "Oportunidades",
+                "Imobiliário",
+              ].map((area) => {
+                const isSelected = selectedArea === area;
+                return (
+                  <TouchableOpacity
+                    key={area}
+                    style={[
+                      dealStyle.chip,
+                      isSelected && dealStyle.chipSelected,
+                    ]}
+                    onPress={() => setSelectedArea(area)}
+                  >
+                    <Text
+                      style={[
+                        dealStyle.chipText,
+                        isSelected && dealStyle.chipTextSelected,
+                      ]}
+                    >
+                      {area}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <TouchableOpacity
+              style={dealStyle.applyButton}
+              onPress={() => setFiltersActive(!filtersActive)}
+            >
+              <Text style={dealStyle.applyButtonText}>Aplicar</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
 
         {loading && deals.length === 0 ? (
           <View
@@ -77,6 +207,15 @@ export default function DealListScreen() {
             keyExtractor={(item) => item._id}
             renderItem={({ item }) => <DealCard item={item} />}
             contentContainerStyle={dealStyle.listContent}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor="#E6C687"
+                colors={["#E6C687"]}
+                progressBackgroundColor={colors.searchBackground || "#223142"}
+              />
+            }
             ListEmptyComponent={
               <Text
                 style={{ color: "#8A94A6", textAlign: "center", marginTop: 10 }}

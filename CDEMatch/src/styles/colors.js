@@ -5,10 +5,12 @@ export const colors = {
   textPrimary: "#EEEEEE",
   textSecondary: "#BF9955",
   textTertiary: "#C8C8C8",
+  textInput: "#000000",
   border: "#967841",
-  searchBackground: "#EEEEEE",
+  inputBackground: "#EEEEEE",
   avatarBackground: "#C3C3C3",
   actionButton: "#967841",
   inputBackground: "#D9D9D9",
   gray: "#8B949E",
+  danger: "#781515",
 };

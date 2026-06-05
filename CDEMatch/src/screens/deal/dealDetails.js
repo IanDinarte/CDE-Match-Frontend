@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   ScrollView,
-  Image
+  Image,
 } from "react-native";
 import api from "../../services/api";
 import { Ionicons } from "@expo/vector-icons";
@@ -115,7 +115,10 @@ export default function DealDetailsScreen({ route }) {
               <Ionicons name="star-outline" size={22} color="#EEEEEE" />
             </TouchableOpacity>
             {isMyDeal ? (
-              <TouchableOpacity style={dealStyle.actionButton}>
+              <TouchableOpacity
+                style={dealStyle.actionButton}
+                onPress={() => navigation.navigate("EditDeal", { deal: deal })}
+              >
                 <Ionicons name="pencil" size={22} color="#EEEEEE" />
               </TouchableOpacity>
             ) : null}

@@ -11,9 +11,14 @@ import DealListScreen from "../screens/deal/dealList";
 import MemberProfileScreen from "../screens/member/memberProfile";
 import MyProfileScreen from "../screens/member/myProfile";
 import DealDetailsScreen from "../screens/deal/dealDetails";
+import SuggestedDealsScreen from "../screens/deal/suggestedDeals";
+import CreateDealScreen from "../screens/deal/createDeal";
+import EditDealScreen from "../screens/deal/editDeal";
 
 const DealStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
+const SuggestionStack = createStackNavigator();
+// const CreateDealStack = createStackNavigator();
 
 const PlaceHolderScreen = () => (
   <View style={{ flex: 1, backgroundColor: "#0D1117" }}>
@@ -60,8 +65,8 @@ export default function TabNavigator() {
       })}
     >
       <Tab.Screen name="List" component={DealStackNavigation} />
-      <Tab.Screen name="Add" component={PlaceHolderScreen} />
-      <Tab.Screen name="Messages" component={PlaceHolderScreen} />
+      <Tab.Screen name="Add" component={CreateDealScreen} />
+      <Tab.Screen name="Messages" component={SuggestionStackNavigation} />
       <Tab.Screen name="Profile" component={ProfileStackNavigation} />
     </Tab.Navigator>
   );
@@ -73,6 +78,7 @@ function DealStackNavigation() {
       <DealStack.Screen name="DealList" component={DealListScreen} />
       <DealStack.Screen name="DealDetails" component={DealDetailsScreen} />
       <DealStack.Screen name="MemberProfile" component={MemberProfileScreen} />
+      <DealStack.Screen name="EditDeal" component={EditDealScreen} />
     </DealStack.Navigator>
   );
 }
@@ -82,7 +88,43 @@ function ProfileStackNavigation() {
     <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
       <ProfileStack.Screen name="MyProfile" component={MyProfileScreen} />
       <ProfileStack.Screen name="DealDetails" component={DealDetailsScreen} />
-      <ProfileStack.Screen name="MemberProfile" component={MemberProfileScreen} />
+      <ProfileStack.Screen name="EditDeal" component={EditDealScreen} />
+      <ProfileStack.Screen
+        name="MemberProfile"
+        component={MemberProfileScreen}
+      />
     </ProfileStack.Navigator>
   );
 }
+
+function SuggestionStackNavigation() {
+  return (
+    <SuggestionStack.Navigator screenOptions={{ headerShown: false }}>
+      <SuggestionStack.Screen
+        name="SuggestedDeals"
+        component={SuggestedDealsScreen}
+      />
+      <SuggestionStack.Screen
+        name="DealDetails"
+        component={DealDetailsScreen}
+      />
+      <SuggestionStack.Screen
+        name="MemberProfile"
+        component={MemberProfileScreen}
+      />
+      <SuggestionStack.Screen name="EditDeal" component={EditDealScreen} />
+    </SuggestionStack.Navigator>
+  );
+}
+
+// function CreateDealStackNavigation() {
+//   return (
+//     <CreateDealStack.Navigator screenOptions={{ headerShown: false }}>
+//       <CreateDealStack.Screen name="CreateDeal" component={CreateDealScreen} />
+//       <CreateDealStack.Screen
+//         name="DealDetails"
+//         component={DealDetailsScreen}
+//       />
+//     </CreateDealStack.Navigator>
+//   );
+// }
