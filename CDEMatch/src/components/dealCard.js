@@ -13,6 +13,8 @@ import { dealStyle } from "../styles/dealStyle";
 import { useNavigation } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import api from "../services/api";
+import { modalStyle } from "../styles/modalStyle";
+import { formStyle } from "../styles/formStyle";
 
 export function DealCard({ item }) {
   const [modalActive, setModalActive] = useState(false);
@@ -23,13 +25,22 @@ export function DealCard({ item }) {
   const navigation = useNavigation();
   const initial = item.owner ? item.owner.name.charAt(0).toUpperCase() : "M";
 
+  const ownerId = item.owner?._id || item.owner;
+
   const loadMembers = () => {
     setModalActive(true);
+    setLoading(true);
 
     api
-      .get("api/member/")
+      .get(`api/member/suggest?dealId=${item._id}&excludeId=${ownerId}`)
       .then((res) => {
-        setMembers(res.data);
+        const membersList =
+          res.data.members !== undefined ? res.data.members : res.data;
+        const suggestedIds = res.data.alreadySuggestedIds || [];
+
+        setMembers(membersList || []);
+        setSuggestedMemberIds(suggestedIds);
+
         setLoading(false);
       })
       .catch((error) => {
@@ -56,89 +67,6 @@ export function DealCard({ item }) {
 
   return (
     <View style={dealStyle.card}>
-      <Modal
-        isVisible={modalActive}
-        onBackdropPress={() => setModalActive(false)}
-        onBackButtonPress={() => setModalActive(false)}
-        backdropOpacity={0.6}
-        style={{ margin: 0, justifyContent: "flex-end" }}
-        animationIn="slideInUp"
-        animationOu="slideInDown"
-        useNativeDriver={true}
-      >
-        <View style={dealStyle.suggestionListModalCard}>
-          {loading && members.length === 0 ? (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <ActivityIndicator size="large" color="#E6C687" />
-            </View>
-          ) : (
-            <FlatList
-              data={members}
-              keyExtractor={(item) => item._id}
-              contentContainerStyle={{ paddingBottom: 20 }}
-              renderItem={({ item: member }) => {
-                const isSuggested = suggestedMemberIds.includes(
-                  member.id || member._id,
-                );
-
-                return (
-                  <View key={member._id} style={dealStyle.memberCard}>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 12,
-                        flexShrink: 1,
-                      }}
-                    >
-                      {member.profilePicture ? (
-                        <Image
-                          source={{ uri: member.profilePicture }}
-                          style={dealStyle.memberAvatar}
-                        />
-                      ) : (
-                        <View style={dealStyle.memberAvatar}>
-                          <Text style={dealStyle.avatarText}>
-                            {member.name.charAt(0).toUpperCase() || "M"}
-                          </Text>
-                        </View>
-                      )}
-
-                      <Text style={dealStyle.memberName}>{member.name}</Text>
-                    </View>
-                    <TouchableOpacity
-                      style={dealStyle.sendButton}
-                      onPress={() => sendSuggestion(member.id)}
-                      disabled={isSuggested}
-                    >
-                      {isSuggested ? (
-                        <Ionicons
-                          name="checkmark-outline"
-                          size={25}
-                          color="#967841"
-                        />
-                      ) : (
-                        <Ionicons
-                          name="send-outline"
-                          size={25}
-                          color="#967841"
-                        />
-                      )}
-                    </TouchableOpacity>
-                  </View>
-                );
-              }}
-            />
-          )}
-        </View>
-      </Modal>
-
       <View style={dealStyle.cardHeader}>
         <TouchableOpacity
           style={dealStyle.headerLeft}
@@ -180,25 +108,119 @@ export function DealCard({ item }) {
       </TouchableOpacity>
 
       <View style={dealStyle.cardActions}>
-        <TouchableOpacity style={dealStyle.actionButton}>
-          <Ionicons name="heart-outline" size={22} color="#EEEEEE" />
+        <TouchableOpacity>
+          <Ionicons
+            style={formStyle.iconButton}
+            name="heart-outline"
+            size={30}
+            color="#EEEEEE"
+          />
         </TouchableOpacity>
-        {/* <TouchableOpacity
-          style={dealStyle.actionButton}
-          onPress={() => navigation.navigate("DealDetails", { id: item._id })}
-        >
-          <Ionicons name="eye-outline" size={22} color="#EEEEEE" />
+        <TouchableOpacity onPress={() => loadMembers()}>
+          <Ionicons
+            style={formStyle.iconButton}
+            name="send-outline"
+            size={30}
+            color="#EEEEEE"
+          />
+        </TouchableOpacity>
+        {/* <TouchableOpacity>
+          <Ionicons
+            style={formStyle.iconButton}
+            name="star-outline"
+            size={30}
+            color="#EEEEEE"
+          />
         </TouchableOpacity> */}
-        <TouchableOpacity
-          style={dealStyle.actionButton}
-          onPress={() => loadMembers()}
-        >
-          <Ionicons name="send-outline" size={22} color="#EEEEEE" />
-        </TouchableOpacity>
-        <TouchableOpacity style={dealStyle.actionButton}>
-          <Ionicons name="star-outline" size={22} color="#EEEEEE" />
-        </TouchableOpacity>
       </View>
+      <Modal
+        isVisible={modalActive}
+        onBackdropPress={() => setModalActive(false)}
+        onBackButtonPress={() => setModalActive(false)}
+        backdropOpacity={0.6}
+        style={{ margin: 0, justifyContent: "flex-end" }}
+        animationIn="slideInUp"
+        animationOu="slideInDown"
+        useNativeDriver={true}
+      >
+        <View style={modalStyle.suggestionListModalCard}>
+          <View style={modalStyle.modalHeader}>
+            <Text style={modalStyle.modalTitle}>
+              Sugerir Negócio a outro Membro
+            </Text>
+            <TouchableOpacity onPress={() => setModalActive(false)}>
+              <Ionicons name="close" size={24} color="#EEE" />
+            </TouchableOpacity>
+          </View>
+          {loading && members.length === 0 ? (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <ActivityIndicator size="large" color="#E6C687" />
+            </View>
+          ) : (
+            <FlatList
+              data={members}
+              keyExtractor={(item) => item._id}
+              contentContainerStyle={{ paddingBottom: 20 }}
+              renderItem={({ item: member }) => {
+                const isSuggested = suggestedMemberIds.includes(member.id);
+
+                return (
+                  <View key={member._id} style={modalStyle.memberCard}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 12,
+                        flexShrink: 1,
+                      }}
+                    >
+                      {member.profilePicture ? (
+                        <Image
+                          source={{ uri: member.profilePicture }}
+                          style={modalStyle.memberAvatar}
+                        />
+                      ) : (
+                        <View style={modalStyle.memberAvatar}>
+                          <Text style={dealStyle.avatarText}>
+                            {member.name.charAt(0).toUpperCase() || "M"}
+                          </Text>
+                        </View>
+                      )}
+
+                      <Text style={modalStyle.memberName}>{member.name}</Text>
+                    </View>
+                    <TouchableOpacity
+                      style={modalStyle.sendButton}
+                      onPress={() => sendSuggestion(member.id)}
+                      disabled={isSuggested}
+                    >
+                      {isSuggested ? (
+                        <Ionicons
+                          name="checkmark-outline"
+                          size={25}
+                          color="#967841"
+                        />
+                      ) : (
+                        <Ionicons
+                          name="send-outline"
+                          size={25}
+                          color="#967841"
+                        />
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                );
+              }}
+            />
+          )}
+        </View>
+      </Modal>
     </View>
   );
 }

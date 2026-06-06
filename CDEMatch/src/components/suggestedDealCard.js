@@ -13,6 +13,7 @@ import { dealStyle } from "../styles/dealStyle";
 import { useNavigation } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import api from "../services/api";
+import { formStyle } from "../styles/formStyle";
 
 export function SuggestedDealCard({ item, onActionComplete }) {
   const [modalActive, setModalActive] = useState(false);
@@ -59,7 +60,7 @@ export function SuggestedDealCard({ item, onActionComplete }) {
   const rejectSuggestion = () => {
     api
       .delete(`api/deal/suggestion/${item._id}`)
-      .then((res) => {
+      .then(() => {
         if (onActionComplete) onActionComplete();
       })
       .catch((error) => {
@@ -69,6 +70,86 @@ export function SuggestedDealCard({ item, onActionComplete }) {
 
   return (
     <View style={dealStyle.card}>
+      <View style={dealStyle.cardHeader}>
+        <TouchableOpacity
+          style={dealStyle.headerLeft}
+          onPress={() =>
+            navigation.navigate("MemberProfile", { id: item.deal.owner?._id })
+          }
+        >
+          {item.deal.owner?.profilePicture ? (
+            <Image
+              source={{ uri: item.deal.owner?.profilePicture }}
+              style={dealStyle.avatar}
+            ></Image>
+          ) : (
+            <View style={dealStyle.avatar}>
+              <Text style={dealStyle.avatarText}>{initial}</Text>
+            </View>
+          )}
+
+          <View>
+            <Text style={dealStyle.userName}>
+              {item.deal.owner.name || "Utilizador"}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate("DealDetails", { id: item.deal._id })
+        }
+      >
+        <Text style={dealStyle.suggestedBy}>
+          Sugerido por: {item.suggestedBy.name}
+        </Text>
+        <Text style={dealStyle.dealTitle}>{item.deal.title}</Text>
+        <Text style={dealStyle.dealInfo}>
+          {item.deal.type}, {item.deal.area}
+        </Text>
+        <Text style={dealStyle.dealInfo}>{item.deal.price} €</Text>
+        <Text style={dealStyle.dealDescription}>{item.deal.description}</Text>
+      </TouchableOpacity>
+
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <View style={dealStyle.cardActions}>
+          <TouchableOpacity>
+            <Ionicons
+              style={formStyle.iconButton}
+              name="heart-outline"
+              size={30}
+              color="#EEEEEE"
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => loadMembers()}>
+            <Ionicons
+              style={formStyle.iconButton}
+              name="send-outline"
+              size={30}
+              color="#EEEEEE"
+            />
+          </TouchableOpacity>
+          {/* <TouchableOpacity>
+            <Ionicons
+              style={formStyle.iconButton}
+              name="star-outline"
+              size={30}
+              color="#EEEEEE"
+            />
+          </TouchableOpacity> */}
+        </View>
+        <View style={dealStyle.dangerActions}>
+          <TouchableOpacity onPress={() => rejectSuggestion()}>
+            <Ionicons
+              style={formStyle.iconDanger}
+              name="trash-outline"
+              size={30}
+              color="#EEEEEE"
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
       <Modal
         isVisible={modalActive}
         onBackdropPress={() => setModalActive(false)}
@@ -151,73 +232,6 @@ export function SuggestedDealCard({ item, onActionComplete }) {
           )}
         </View>
       </Modal>
-
-      <View style={dealStyle.cardHeader}>
-        <TouchableOpacity
-          style={dealStyle.headerLeft}
-          onPress={() =>
-            navigation.navigate("MemberProfile", { id: item.deal.owner?._id })
-          }
-        >
-          {item.deal.owner?.profilePicture ? (
-            <Image
-              source={{ uri: item.deal.owner?.profilePicture }}
-              style={dealStyle.avatar}
-            ></Image>
-          ) : (
-            <View style={dealStyle.avatar}>
-              <Text style={dealStyle.avatarText}>{initial}</Text>
-            </View>
-          )}
-
-          <View>
-            <Text style={dealStyle.userName}>
-              {item.deal.owner.name || "Utilizador"}
-            </Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity
-        onPress={() =>
-          navigation.navigate("DealDetails", { id: item.deal._id })
-        }
-      >
-        <Text style={dealStyle.suggestedBy}>
-          Sugerido por: {item.suggestedBy.name}
-        </Text>
-        <Text style={dealStyle.dealTitle}>{item.deal.title}</Text>
-        <Text style={dealStyle.dealInfo}>
-          {item.deal.type}, {item.deal.area}
-        </Text>
-        <Text style={dealStyle.dealInfo}>{item.deal.price} €</Text>
-        <Text style={dealStyle.dealDescription}>{item.deal.description}</Text>
-      </TouchableOpacity>
-
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <View style={dealStyle.cardActions}>
-          <TouchableOpacity style={dealStyle.actionButton}>
-            <Ionicons name="heart-outline" size={22} color="#EEEEEE" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={dealStyle.actionButton}
-            onPress={() => loadMembers()}
-          >
-            <Ionicons name="send-outline" size={22} color="#EEEEEE" />
-          </TouchableOpacity>
-          <TouchableOpacity style={dealStyle.actionButton}>
-            <Ionicons name="star-outline" size={22} color="#EEEEEE" />
-          </TouchableOpacity>
-        </View>
-        <View style={dealStyle.dangerActions}>
-          <TouchableOpacity
-            style={dealStyle.dangerButton}
-            onPress={() => rejectSuggestion()}
-          >
-            <Ionicons name="trash-outline" size={22} color="#EEEEEE" />
-          </TouchableOpacity>
-        </View>
-      </View>
     </View>
   );
 }

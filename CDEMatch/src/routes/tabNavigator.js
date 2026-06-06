@@ -7,21 +7,24 @@ import { colors } from "../styles/colors";
 import { createStackNavigator } from "@react-navigation/stack";
 
 //import das telas que vao ser incluidas no toolbar
-import DealListScreen from "../screens/deal/dealList";
+// import MyProfileScreen from "../screens/member/myProfile";
+import EditMemberScreen from "../screens/member/editMember";
 import MemberProfileScreen from "../screens/member/memberProfile";
-import MyProfileScreen from "../screens/member/myProfile";
+
+import DealListScreen from "../screens/deal/dealList";
 import DealDetailsScreen from "../screens/deal/dealDetails";
 import SuggestedDealsScreen from "../screens/deal/suggestedDeals";
 import CreateDealScreen from "../screens/deal/createDeal";
 import EditDealScreen from "../screens/deal/editDeal";
 
-const DealStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
+const DealStack = createStackNavigator();
 const SuggestionStack = createStackNavigator();
+const MatchesStack = createStackNavigator();
 // const CreateDealStack = createStackNavigator();
 
 const PlaceHolderScreen = () => (
-  <View style={{ flex: 1, backgroundColor: "#0D1117" }}>
+  <View style={{ flex: 1, backgroundColor: colors.background }}>
     <Text style={{ color: "white", padding: 50 }}>Em construção...</Text>
   </View>
 );
@@ -46,6 +49,9 @@ export default function TabNavigator() {
             case "List":
               iconName = focused ? "list" : "list-outline";
               break;
+            case "Matches":
+              iconName = focused ? "heart" : "heart-outline";
+              break;
             case "Add":
               iconName = focused ? "add-circle" : "add-circle-outline";
               break;
@@ -65,6 +71,7 @@ export default function TabNavigator() {
       })}
     >
       <Tab.Screen name="List" component={DealStackNavigation} />
+      <Tab.Screen name="Matches" component={PlaceHolderScreen} />
       <Tab.Screen name="Add" component={CreateDealScreen} />
       <Tab.Screen name="Messages" component={SuggestionStackNavigation} />
       <Tab.Screen name="Profile" component={ProfileStackNavigation} />
@@ -78,6 +85,7 @@ function DealStackNavigation() {
       <DealStack.Screen name="DealList" component={DealListScreen} />
       <DealStack.Screen name="DealDetails" component={DealDetailsScreen} />
       <DealStack.Screen name="MemberProfile" component={MemberProfileScreen} />
+      <DealStack.Screen name="EditMember" component={EditMemberScreen} />
       <DealStack.Screen name="EditDeal" component={EditDealScreen} />
     </DealStack.Navigator>
   );
@@ -86,13 +94,14 @@ function DealStackNavigation() {
 function ProfileStackNavigation() {
   return (
     <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
-      <ProfileStack.Screen name="MyProfile" component={MyProfileScreen} />
-      <ProfileStack.Screen name="DealDetails" component={DealDetailsScreen} />
-      <ProfileStack.Screen name="EditDeal" component={EditDealScreen} />
       <ProfileStack.Screen
         name="MemberProfile"
         component={MemberProfileScreen}
       />
+      {/* <ProfileStack.Screen name="MyProfile" component={MyProfileScreen} /> */}
+      <ProfileStack.Screen name="EditMember" component={EditMemberScreen} />
+      <ProfileStack.Screen name="DealDetails" component={DealDetailsScreen} />
+      <ProfileStack.Screen name="EditDeal" component={EditDealScreen} />
     </ProfileStack.Navigator>
   );
 }
@@ -112,19 +121,23 @@ function SuggestionStackNavigation() {
         name="MemberProfile"
         component={MemberProfileScreen}
       />
+      <SuggestionStack.Screen name="EditMember" component={EditMemberScreen} />
       <SuggestionStack.Screen name="EditDeal" component={EditDealScreen} />
     </SuggestionStack.Navigator>
   );
 }
 
-// function CreateDealStackNavigation() {
+// function MatchesStackNavigation() {
 //   return (
-//     <CreateDealStack.Navigator screenOptions={{ headerShown: false }}>
-//       <CreateDealStack.Screen name="CreateDeal" component={CreateDealScreen} />
-//       <CreateDealStack.Screen
-//         name="DealDetails"
-//         component={DealDetailsScreen}
+//     <MatchesStack.Navigator screenOptions={{ headerShown: false }}>
+//       <MatchesStack.Screen name="Matches" component={PlaceHolderScreen} />
+//       <MatchesStack.Screen name="DealDetails" component={DealDetailsScreen} />
+//       <MatchesStack.Screen
+//         name="MemberProfile"
+//         component={MemberProfileScreen}
 //       />
-//     </CreateDealStack.Navigator>
+//       <MatchesStack.Screen name="EditMember" component={EditMemberScreen} />
+//       <MatchesStack.Screen name="EditDeal" component={EditDealScreen} />
+//     </MatchesStack.Navigator>
 //   );
 // }

@@ -17,6 +17,7 @@ import { dealStyle } from "../../styles/dealStyle";
 import { DealCard } from "../../components/dealCard";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../../styles/colors";
+import { modalStyle } from "../../styles/modalStyle";
 
 export default function DealListScreen() {
   const [deals, setDeals] = useState([]);
@@ -93,28 +94,28 @@ export default function DealListScreen() {
           animationOu="slideInDown"
           useNativeDriver={true}
         >
-          <View style={dealStyle.filterModalCard}>
-            <View style={dealStyle.modalHeader}>
-              <Text style={dealStyle.modalTitle}>Filtrar Negócios</Text>
+          <View style={modalStyle.filterModalCard}>
+            <View style={modalStyle.modalHeader}>
+              <Text style={modalStyle.modalTitle}>Filtrar Negócios</Text>
               <TouchableOpacity onPress={() => setFiltersActive(false)}>
                 <Ionicons name="close" size={24} color="#EEE" />
               </TouchableOpacity>
             </View>
 
-            <Text style={dealStyle.filterLabel}>Limite de Preço</Text>
-            <View style={dealStyle.chipContainer}>
-              <Text style={dealStyle.filterText}>de</Text>
+            <Text style={modalStyle.filterLabel}>Limite de Preço</Text>
+            <View style={modalStyle.chipContainer}>
+              <Text style={modalStyle.filterText}>de</Text>
               <TextInput
-                style={dealStyle.priceBox}
+                style={modalStyle.priceBox}
                 placeholder="€"
                 value={minPrice}
                 onChangeText={(value) => setMinPrice(value)}
                 clearButtonMode="while-editing"
                 inputMode="decimal"
                 />
-              <Text style={dealStyle.filterText}>até</Text>
+              <Text style={modalStyle.filterText}>até</Text>
               <TextInput
-                style={dealStyle.priceBox}
+                style={modalStyle.priceBox}
                 placeholder="€"
                 value={maxPrice}
                 onChangeText={(value) => setMaxPrice(value)}
@@ -123,23 +124,23 @@ export default function DealListScreen() {
               />
             </View>
 
-            <Text style={dealStyle.filterLabel}>Tipo de Negócio</Text>
-            <View style={dealStyle.chipContainer}>
+            <Text style={modalStyle.filterLabel}>Tipo de Negócio</Text>
+            <View style={modalStyle.chipContainer}>
               {["Todos", "Oferta", "Procura"].map((type) => {
                 const isSelected = selectedType === type;
                 return (
                   <TouchableOpacity
                     key={type}
                     style={[
-                      dealStyle.chip,
-                      isSelected && dealStyle.chipSelected,
+                      modalStyle.chip,
+                      isSelected && modalStyle.chipSelected,
                     ]}
                     onPress={() => setSelectedType(type)}
                   >
                     <Text
                       style={[
-                        dealStyle.chipText,
-                        isSelected && dealStyle.chipTextSelected,
+                        modalStyle.chipText,
+                        isSelected && modalStyle.chipTextSelected,
                       ]}
                     >
                       {type}
@@ -149,8 +150,8 @@ export default function DealListScreen() {
               })}
             </View>
 
-            <Text style={dealStyle.filterLabel}>Área de Atuação</Text>
-            <View style={dealStyle.chipContainer}>
+            <Text style={modalStyle.filterLabel}>Área de Atuação</Text>
+            <View style={modalStyle.chipContainer}>
               {[
                 "Todas",
                 "Investimento",
@@ -168,15 +169,15 @@ export default function DealListScreen() {
                   <TouchableOpacity
                     key={area}
                     style={[
-                      dealStyle.chip,
-                      isSelected && dealStyle.chipSelected,
+                      modalStyle.chip,
+                      isSelected && modalStyle.chipSelected,
                     ]}
                     onPress={() => setSelectedArea(area)}
                   >
                     <Text
                       style={[
-                        dealStyle.chipText,
-                        isSelected && dealStyle.chipTextSelected,
+                        modalStyle.chipText,
+                        isSelected && modalStyle.chipTextSelected,
                       ]}
                     >
                       {area}
@@ -187,10 +188,10 @@ export default function DealListScreen() {
             </View>
 
             <TouchableOpacity
-              style={dealStyle.applyButton}
+              style={modalStyle.applyButton}
               onPress={() => setFiltersActive(!filtersActive)}
             >
-              <Text style={dealStyle.applyButtonText}>Aplicar</Text>
+              <Text style={modalStyle.applyButtonText}>Aplicar</Text>
             </TouchableOpacity>
           </View>
         </Modal>

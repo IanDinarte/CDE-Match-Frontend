@@ -6,16 +6,22 @@ import {
   FlatList,
   ActivityIndicator,
   RefreshControl,
+  TouchableOpacity,
 } from "react-native";
 import { dealStyle } from "../../styles/dealStyle";
 import { colors } from "../../styles/colors";
 import api from "../../services/api";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import { SuggestedDealCard } from "../../components/suggestedDealCard";
+import { formStyle } from "../../styles/formStyle";
 
 export default function SuggestedDealsScreen() {
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  const navigation = useNavigation();
 
   const fetchSuggestedDeals = () => {
     api
@@ -44,6 +50,13 @@ export default function SuggestedDealsScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={dealStyle.detailsHeaderContainer}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons
+            style={formStyle.backButton}
+            name="chevron-back-outline"
+            size={30}
+          />
+        </TouchableOpacity>
         <Text style={dealStyle.detailTitle}>Negócios Sugeridos</Text>
       </View>
 

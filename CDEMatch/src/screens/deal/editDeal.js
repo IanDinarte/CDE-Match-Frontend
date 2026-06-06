@@ -12,6 +12,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../styles/colors";
 import { dealStyle } from "../../styles/dealStyle";
+import { modalStyle } from "../../styles/modalStyle";
+import { formStyle } from "../../styles/formStyle";
 
 export default function EditDealScreen({ route }) {
   const [title, setTitle] = useState(route.params.deal.title);
@@ -55,6 +57,13 @@ export default function EditDealScreen({ route }) {
     <View style={{ flex: 1 }}>
       <ScrollView style={dealStyle.detailsContainer}>
         <View style={dealStyle.detailsHeaderContainer}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons
+              style={formStyle.backButton}
+              name="chevron-back-outline"
+              size={30}
+            />
+          </TouchableOpacity>
           <Text style={dealStyle.detailTitle}>Editar Negócio</Text>
         </View>
 
@@ -114,26 +123,26 @@ export default function EditDealScreen({ route }) {
               animationOu="slideInDown"
               useNativeDriver={true}
             >
-              <View style={dealStyle.filterModalCard}>
-                <Text style={dealStyle.filterLabel}>
+              <View style={modalStyle.filterModalCard}>
+                <Text style={modalStyle.filterLabel}>
                   Selecione o Tipo de Negócio
                 </Text>
-                <View style={dealStyle.chipContainer}>
+                <View style={modalStyle.chipContainer}>
                   {["Oferta", "Procura"].map((dealType) => {
                     const isSelected = type === dealType;
                     return (
                       <TouchableOpacity
                         key={dealType}
                         style={[
-                          dealStyle.chip,
-                          isSelected && dealStyle.chipSelected,
+                          modalStyle.chip,
+                          isSelected && modalStyle.chipSelected,
                         ]}
                         onPress={() => setType(dealType)}
                       >
                         <Text
                           style={[
-                            dealStyle.chipText,
-                            isSelected && dealStyle.chipTextSelected,
+                            modalStyle.chipText,
+                            isSelected && modalStyle.chipTextSelected,
                           ]}
                         >
                           {dealType}
@@ -165,11 +174,11 @@ export default function EditDealScreen({ route }) {
               animationOu="slideInDown"
               useNativeDriver={true}
             >
-              <View style={dealStyle.filterModalCard}>
-                <Text style={dealStyle.filterLabel}>
+              <View style={modalStyle.filterModalCard}>
+                <Text style={modalStyle.filterLabel}>
                   Selecione a Area do Negócio
                 </Text>
-                <View style={dealStyle.chipContainer}>
+                <View style={modalStyle.chipContainer}>
                   {[
                     "Investimento",
                     "Venda de Ativo",
@@ -186,15 +195,15 @@ export default function EditDealScreen({ route }) {
                       <TouchableOpacity
                         key={dealArea}
                         style={[
-                          dealStyle.chip,
-                          isSelected && dealStyle.chipSelected,
+                          modalStyle.chip,
+                          isSelected && modalStyle.chipSelected,
                         ]}
                         onPress={() => setArea(dealArea)}
                       >
                         <Text
                           style={[
-                            dealStyle.chipText,
-                            isSelected && dealStyle.chipTextSelected,
+                            modalStyle.chipText,
+                            isSelected && modalStyle.chipTextSelected,
                           ]}
                         >
                           {dealArea}
@@ -228,26 +237,26 @@ export default function EditDealScreen({ route }) {
               animationOu="slideInDown"
               useNativeDriver={true}
             >
-              <View style={dealStyle.filterModalCard}>
-                <Text style={dealStyle.filterLabel}>
+              <View style={modalStyle.filterModalCard}>
+                <Text style={modalStyle.filterLabel}>
                   Selecione o Estado do Negócio
                 </Text>
-                <View style={dealStyle.chipContainer}>
+                <View style={modalStyle.chipContainer}>
                   {["Disponivel", "Fechado", "Cancelado"].map((dealState) => {
                     const isSelected = state === dealState;
                     return (
                       <TouchableOpacity
                         key={dealState}
                         style={[
-                          dealStyle.chip,
-                          isSelected && dealStyle.chipSelected,
+                          modalStyle.chip,
+                          isSelected && modalStyle.chipSelected,
                         ]}
                         onPress={() => setState(dealState)}
                       >
                         <Text
                           style={[
-                            dealStyle.chipText,
-                            isSelected && dealStyle.chipTextSelected,
+                            modalStyle.chipText,
+                            isSelected && modalStyle.chipTextSelected,
                           ]}
                         >
                           {dealState}

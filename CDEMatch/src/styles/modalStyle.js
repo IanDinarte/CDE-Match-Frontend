@@ -1,0 +1,157 @@
+import { StyleSheet } from "react-native";
+import { colors } from "./colors";
+
+export const modalStyle = StyleSheet.create({
+    modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.background,
+    paddingBottom: 10,
+  },
+  modalTitle: {
+    color: colors.primary,
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  modalContent: {
+    marginVertical: 10,
+  },
+  filterButton: {
+    marginTop: 7,
+    marginLeft: 7,
+  },
+  filterModalCard: {
+    backgroundColor: colors.cardBackground,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingHorizontal: 20,
+    paddingTop: 15,
+    paddingBottom: 40,
+    maxHeight: "80%", //so vai contar pros modais com scrollview
+    width: "100%",
+  },
+  filterLabel: {
+    color: colors.textTertiary,
+    fontSize: 14,
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginTop: 15,
+    marginBottom: 10,
+  },
+  filterText: {
+    color: colors.textTertiary,
+    fontSize: 14,
+    fontWeight: "medium",
+    letterSpacing: 1,
+    marginTop: 15,
+    marginBottom: 10,
+  },
+  priceContainer: {
+    marginTop: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: "row",
+  },
+  priceBox: {
+    backgroundColor: colors.inputBackground,
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    color: colors.textInput,
+    fontSize: 16,
+    // flex: 1,
+    // alignItems: "center"
+  },
+  chipContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 5,
+  },
+  chip: {
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: colors.background,
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  chipSelected: {
+    backgroundColor: colors.actionButton,
+    borderColor: colors.actionButton,
+  },
+  chipText: {
+    color: colors.textPrimary,
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  chipTextSelected: {
+    color: colors.cardBackground,
+    fontWeight: "bold",
+  },
+  applyButton: {
+    backgroundColor: colors.actionButton,
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  applyButtonText: {
+    color: colors.cardBackground,
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+
+  //suggest member list
+  suggestionListModalCard: {
+    backgroundColor: colors.cardBackground,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    // paddingBottom: 40,
+    maxHeight: "75%",
+    width: "100%",
+  },
+  memberCard: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+    paddingBottom: 10,
+    paddingHorizontal: 10,
+    borderBottomWidth: 2,
+    // borderBottomRightRadius: 20,
+    // borderBottomLeftRadius: 20,
+    borderBottomColor: colors.background,
+  },
+  memberAvatar: {
+    width: 45,
+    height: 45,
+    borderRadius: 50,
+    backgroundColor: colors.avatarBackground,
+    justifyContent: "center",
+    alignItems: "center",
+    // marginRight: 12,
+  },
+  memberName: {
+    fontSize: 15,
+    fontWeight: "bold",
+    flex: 0,
+    flexWrap: "wrap",
+    flexShrink: 1,
+    color: colors.textPrimary,
+    paddingRight: 10,
+  },
+  sendButton: {
+    flex: 0,
+    marginRight: 12,
+    justifyContent: "flex-end",
+  },
+});

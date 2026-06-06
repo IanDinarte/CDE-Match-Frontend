@@ -50,7 +50,7 @@ export const memberStyle = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 50,
-    backgroundColor: "#C4C4C4",
+    backgroundColor: colors.avatarBackground,
     justifyContent: "center",
     alignItems: "center",
   },
