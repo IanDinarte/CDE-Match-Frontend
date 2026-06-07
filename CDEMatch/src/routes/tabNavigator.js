@@ -13,6 +13,7 @@ import MemberProfileScreen from "../screens/member/memberProfile";
 
 import DealListScreen from "../screens/deal/dealList";
 import DealDetailsScreen from "../screens/deal/dealDetails";
+import MatchesListScreen from "../screens/deal/matchesList";
 import SuggestedDealsScreen from "../screens/deal/suggestedDeals";
 import CreateDealScreen from "../screens/deal/createDeal";
 import EditDealScreen from "../screens/deal/editDeal";
@@ -21,7 +22,6 @@ const ProfileStack = createStackNavigator();
 const DealStack = createStackNavigator();
 const SuggestionStack = createStackNavigator();
 const MatchesStack = createStackNavigator();
-// const CreateDealStack = createStackNavigator();
 
 const PlaceHolderScreen = () => (
   <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -71,7 +71,7 @@ export default function TabNavigator() {
       })}
     >
       <Tab.Screen name="List" component={DealStackNavigation} />
-      <Tab.Screen name="Matches" component={PlaceHolderScreen} />
+      <Tab.Screen name="Matches" component={MatchesStackNavigation} />
       <Tab.Screen name="Add" component={CreateDealScreen} />
       <Tab.Screen name="Messages" component={SuggestionStackNavigation} />
       <Tab.Screen name="Profile" component={ProfileStackNavigation} />
@@ -89,6 +89,18 @@ function DealStackNavigation() {
       <DealStack.Screen name="EditDeal" component={EditDealScreen} />
     </DealStack.Navigator>
   );
+}
+
+function MatchesStackNavigation(){
+  return(
+    <MatchesStack.Navigator screenOptions={{headerShown: false}}>
+      <MatchesStack.Screen name="MatchesList" component={MatchesListScreen}/>
+      <MatchesStack.Screen name="DealDetails" component={DealDetailsScreen}/>
+      <MatchesStack.Screen name="MemberProfile" component={MemberProfileScreen}/>
+      <MatchesStack.Screen name="EditMember" component={EditMemberScreen}/>
+      <MatchesStack.Screen name="EditDeal" component={EditDealScreen}/>
+    </MatchesStack.Navigator>
+  )
 }
 
 function ProfileStackNavigation() {
@@ -126,18 +138,3 @@ function SuggestionStackNavigation() {
     </SuggestionStack.Navigator>
   );
 }
-
-// function MatchesStackNavigation() {
-//   return (
-//     <MatchesStack.Navigator screenOptions={{ headerShown: false }}>
-//       <MatchesStack.Screen name="Matches" component={PlaceHolderScreen} />
-//       <MatchesStack.Screen name="DealDetails" component={DealDetailsScreen} />
-//       <MatchesStack.Screen
-//         name="MemberProfile"
-//         component={MemberProfileScreen}
-//       />
-//       <MatchesStack.Screen name="EditMember" component={EditMemberScreen} />
-//       <MatchesStack.Screen name="EditDeal" component={EditDealScreen} />
-//     </MatchesStack.Navigator>
-//   );
-// }

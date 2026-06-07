@@ -23,6 +23,8 @@ export function DealCard({ item }) {
   const [suggestedMemberIds, setSuggestedMemberIds] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [matched, setMatched] = useState(false);
+
   const navigation = useNavigation();
   const initial = item.owner ? item.owner.name.charAt(0).toUpperCase() : "M";
 

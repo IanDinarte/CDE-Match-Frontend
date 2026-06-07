@@ -10,10 +10,10 @@ import {
   TextInput,
   RefreshControl,
   Alert,
-  Linking,
 } from "react-native";
 import api from "../../services/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as WebBrowser from "expo-web-browser";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { globalStyles } from "../../styles/globalStyles";
@@ -140,15 +140,7 @@ export default function MemberProfileScreen({ route }) {
     }
 
     try {
-      const supported = await Linking.canOpenURL(formattedUrl);
-      if (supported) {
-        await Linking.openURL(formattedUrl);
-      } else {
-        Alert.alert(
-          "Erro",
-          "Não foi possível abrir este link: " + formattedUrl,
-        );
-      }
+      await WebBrowser.openBrowserAsync(formattedUrl);
     } catch (error) {
       Alert.alert("Erro", "Ocorreu um erro ao tentar abrir o link.");
     }
@@ -261,19 +253,19 @@ export default function MemberProfileScreen({ route }) {
           </Text>
         ) : null}
 
-        <View>
-          {member?.websites && member.websites.length > 0
-            ? member.websites.map((item, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={{ marginBottom: 100 }}
-                  onPress={() => handleOpenLink(item.link)}
-                >
-                  <Text style={memberStyle.website}>{item.name}</Text>
-                </TouchableOpacity>
-              ))
-            : null}
-        </View>
+        {member?.websites && member.websites.length > 0 && (
+          <View style={{ marginTop: 5 }}>
+            {member.websites.map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                style={{ marginBottom: 5 }}
+                onPress={() => handleOpenLink(item.link)}
+              >
+                <Text style={memberStyle.website}>{item.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </View>
 
       {isMyProfile ? (

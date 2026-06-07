@@ -86,119 +86,6 @@ export default function DealListScreen() {
           </TouchableOpacity>
         </View>
 
-        <Modal
-          isVisible={filtersActive}
-          onBackdropPress={() => setFiltersActive(false)}
-          onBackButtonPress={() => setFiltersActive(false)}
-          backdropOpacity={0.6}
-          backdropTransitionOutTiming={10}
-          style={{ margin: 0, justifyContent: "flex-end" }}
-          animationIn="slideInUp"
-          animationOut="slideOutDown"
-          useNativeDriver={true}
-        >
-          <View style={modalStyle.filterModalCard}>
-            <View style={modalStyle.modalHeader}>
-              <Text style={modalStyle.modalTitle}>Filtrar Negócios</Text>
-              <TouchableOpacity onPress={() => setFiltersActive(false)}>
-                <Ionicons name="close" size={24} color="#EEE" />
-              </TouchableOpacity>
-            </View>
-
-            <Text style={modalStyle.filterLabel}>Limite de Preço</Text>
-            <View style={modalStyle.chipContainer}>
-              <Text style={modalStyle.filterText}>de</Text>
-              <TextInput
-                style={modalStyle.priceBox}
-                placeholder="€"
-                value={minPrice}
-                onChangeText={(value) => setMinPrice(value)}
-                clearButtonMode="while-editing"
-                inputMode="decimal"
-              />
-              <Text style={modalStyle.filterText}>até</Text>
-              <TextInput
-                style={modalStyle.priceBox}
-                placeholder="€"
-                value={maxPrice}
-                onChangeText={(value) => setMaxPrice(value)}
-                clearButtonMode="while-editing"
-                inputMode="decimal"
-              />
-            </View>
-
-            <Text style={modalStyle.filterLabel}>Tipo de Negócio</Text>
-            <View style={modalStyle.chipContainer}>
-              {["Todos", "Oferta", "Procura"].map((type) => {
-                const isSelected = selectedType === type;
-                return (
-                  <TouchableOpacity
-                    key={type}
-                    style={[
-                      modalStyle.chip,
-                      isSelected && modalStyle.chipSelected,
-                    ]}
-                    onPress={() => setSelectedType(type)}
-                  >
-                    <Text
-                      style={[
-                        modalStyle.chipText,
-                        isSelected && modalStyle.chipTextSelected,
-                      ]}
-                    >
-                      {type}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-
-            <Text style={modalStyle.filterLabel}>Área de Atuação</Text>
-            <View style={modalStyle.chipContainer}>
-              {[
-                "Todas",
-                "Investimento",
-                "Venda de Ativo",
-                "Parceria Estratégica",
-                "Compra de Negócio",
-                "Financiamento",
-                "Ajuda Rápida",
-                "Procura de Perfis Chave",
-                "Oportunidades",
-                "Imobiliário",
-              ].map((area) => {
-                const isSelected = selectedArea === area;
-                return (
-                  <TouchableOpacity
-                    key={area}
-                    style={[
-                      modalStyle.chip,
-                      isSelected && modalStyle.chipSelected,
-                    ]}
-                    onPress={() => setSelectedArea(area)}
-                  >
-                    <Text
-                      style={[
-                        modalStyle.chipText,
-                        isSelected && modalStyle.chipTextSelected,
-                      ]}
-                    >
-                      {area}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-
-            <TouchableOpacity
-              style={modalStyle.applyButton}
-              onPress={() => setFiltersActive(!filtersActive)}
-            >
-              <Text style={modalStyle.applyButtonText}>Aplicar</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
-
         {loading && deals.length === 0 ? (
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -230,6 +117,119 @@ export default function DealListScreen() {
           />
         )}
       </SafeAreaView>
+
+      <Modal
+        isVisible={filtersActive}
+        onBackdropPress={() => setFiltersActive(false)}
+        onBackButtonPress={() => setFiltersActive(false)}
+        backdropOpacity={0.6}
+        backdropTransitionOutTiming={10}
+        style={{ margin: 0, justifyContent: "flex-end" }}
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
+        useNativeDriver={true}
+      >
+        <View style={modalStyle.filterModalCard}>
+          <View style={modalStyle.modalHeader}>
+            <Text style={modalStyle.modalTitle}>Filtrar Negócios</Text>
+            <TouchableOpacity onPress={() => setFiltersActive(false)}>
+              <Ionicons name="close" size={24} color="#EEE" />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={modalStyle.filterLabel}>Limite de Preço</Text>
+          <View style={modalStyle.chipContainer}>
+            <Text style={modalStyle.filterText}>de</Text>
+            <TextInput
+              style={modalStyle.priceBox}
+              placeholder="€"
+              value={minPrice}
+              onChangeText={(value) => setMinPrice(value)}
+              clearButtonMode="while-editing"
+              inputMode="decimal"
+            />
+            <Text style={modalStyle.filterText}>até</Text>
+            <TextInput
+              style={modalStyle.priceBox}
+              placeholder="€"
+              value={maxPrice}
+              onChangeText={(value) => setMaxPrice(value)}
+              clearButtonMode="while-editing"
+              inputMode="decimal"
+            />
+          </View>
+
+          <Text style={modalStyle.filterLabel}>Tipo de Negócio</Text>
+          <View style={modalStyle.chipContainer}>
+            {["Todos", "Oferta", "Procura"].map((type) => {
+              const isSelected = selectedType === type;
+              return (
+                <TouchableOpacity
+                  key={type}
+                  style={[
+                    modalStyle.chip,
+                    isSelected && modalStyle.chipSelected,
+                  ]}
+                  onPress={() => setSelectedType(type)}
+                >
+                  <Text
+                    style={[
+                      modalStyle.chipText,
+                      isSelected && modalStyle.chipTextSelected,
+                    ]}
+                  >
+                    {type}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          <Text style={modalStyle.filterLabel}>Área de Atuação</Text>
+          <View style={modalStyle.chipContainer}>
+            {[
+              "Todas",
+              "Investimento",
+              "Venda de Ativo",
+              "Parceria Estratégica",
+              "Compra de Negócio",
+              "Financiamento",
+              "Ajuda Rápida",
+              "Procura de Perfis Chave",
+              "Oportunidades",
+              "Imobiliário",
+            ].map((area) => {
+              const isSelected = selectedArea === area;
+              return (
+                <TouchableOpacity
+                  key={area}
+                  style={[
+                    modalStyle.chip,
+                    isSelected && modalStyle.chipSelected,
+                  ]}
+                  onPress={() => setSelectedArea(area)}
+                >
+                  <Text
+                    style={[
+                      modalStyle.chipText,
+                      isSelected && modalStyle.chipTextSelected,
+                    ]}
+                  >
+                    {area}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          <TouchableOpacity
+            style={modalStyle.applyButton}
+            onPress={() => setFiltersActive(!filtersActive)}
+          >
+            <Text style={modalStyle.applyButtonText}>Aplicar</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 }
