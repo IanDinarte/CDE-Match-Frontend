@@ -9,10 +9,13 @@ import {
   TouchableOpacity,
   TextInput,
   RefreshControl,
+  Alert,
+  Linking,
 } from "react-native";
 import api from "../../services/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import { globalStyles } from "../../styles/globalStyles";
 import { memberStyle } from "../../styles/memberStyle";
 import { dealStyle } from "../../styles/dealStyle";
@@ -47,7 +50,7 @@ export default function MemberProfileScreen({ route }) {
   const [businessRole, setBusinessRole] = useState("");
   const [businessDescription, setBusinessDescription] = useState("");
   const [businessArea, setBusinessArea] = useState("");
-  const [businessLogo, setBusinessLogo] = useState("");
+  const [imageUri, setImageUri] = useState(null);
 
   const isMyProfile = member?._id === currentUserId;
 
@@ -55,22 +58,100 @@ export default function MemberProfileScreen({ route }) {
     ? member.name.charAt(0).toUpperCase()
     : "U";
 
+  const resetFormFields = () => {
+    setBusinessName("");
+    setBusinessRole("");
+    setBusinessDescription("");
+    setBusinessArea("");
+    setImageUri("");
+  };
+
+  const pickImageFromLibrary = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert(
+        "Permissão necessária",
+        "Precisas de dar acesso à galeria para escolher uma foto.",
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: (ImagePicker.MediaType = "images"),
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageUri(null);
+  };
+
   const addBusiness = () => {
     setAddBusinessActive(false);
 
-    const businessData = {
-      name: businessName,
-      role: businessRole,
-      description: businessDescription,
-      area: businessArea,
-    };
+    const formData = new FormData();
+
+    formData.append("name", businessName);
+    formData.append("role", businessRole);
+    formData.append("description", businessDescription);
+    formData.append("area", businessArea);
+
+    if (imageUri) {
+      const filename = imageUri.split("/").pop();
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : `image`;
+
+      formData.append("logo", {
+        uri: imageUri,
+        name: filename,
+        type: type,
+      });
+    }
 
     api
-      .post(`api/member/${member?._id}/business`, businessData)
+      .post(`api/member/${member?._id}/business`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then(() => {
         fetchMember();
+        Alert.alert("Sucesso", res.data || "Empresa Adicionada.");
+        resetFormFields();
       })
-      .catch((error) => {});
+      .catch((error) => {
+        Alert.alert("Error", error.response.data);
+        console.log(error.message + " " + error.response.data);
+      });
+  };
+
+  const handleOpenLink = async (url) => {
+    let formattedUrl = url.trim();
+
+    if (!/^https?:\/\//i.test(formattedUrl)) {
+      formattedUrl = `https://${formattedUrl}`;
+    }
+
+    try {
+      const supported = await Linking.canOpenURL(formattedUrl);
+      if (supported) {
+        await Linking.openURL(formattedUrl);
+      } else {
+        Alert.alert(
+          "Erro",
+          "Não foi possível abrir este link: " + formattedUrl,
+        );
+      }
+    } catch (error) {
+      Alert.alert("Erro", "Ocorreu um erro ao tentar abrir o link.");
+    }
   };
 
   const fetchMember = () => {
@@ -102,17 +183,6 @@ export default function MemberProfileScreen({ route }) {
       fetchMember();
     }, [id]),
   );
-
-  // useEffect(() => {
-  //   AsyncStorage.getItem("userToken").then((token) => {
-  //     if (token) {
-  //       const decoded = jwtDecode(token);
-  //       setCurrentUserId(decoded.id);
-  //     }
-  //   });
-
-  //   fetchMember();
-  // }, [id]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -194,9 +264,13 @@ export default function MemberProfileScreen({ route }) {
         <View>
           {member?.websites && member.websites.length > 0
             ? member.websites.map((item, index) => (
-                <Text key={index} style={memberStyle.website}>
-                  {item.name}
-                </Text>
+                <TouchableOpacity
+                  key={index}
+                  style={{ marginBottom: 100 }}
+                  onPress={() => handleOpenLink(item.link)}
+                >
+                  <Text style={memberStyle.website}>{item.name}</Text>
+                </TouchableOpacity>
               ))
             : null}
         </View>
@@ -305,16 +379,13 @@ export default function MemberProfileScreen({ route }) {
           onBackdropPress={() => setAddBusinessActive(false)}
           onBackButtonPress={() => setAddBusinessActive(false)}
           onModalHide={() => {
-            setBusinessName("");
-            setBusinessRole("");
-            setBusinessDescription("");
-            setBusinessArea("");
-            setBusinessLogo("");
+            resetFormFields();
           }}
           backdropOpacity={0.6}
+          backdropTransitionOutTiming={10}
           style={{ margin: 0, justifyContent: "flex-end" }}
           animationIn="slideInUp"
-          animationOu="slideInDown"
+          animationOut="slideOutDown"
           useNativeDriver={true}
         >
           <ScrollView style={modalStyle.filterModalCard}>
@@ -368,6 +439,53 @@ export default function MemberProfileScreen({ route }) {
                 value={businessArea}
                 onChangeText={(text) => setBusinessArea(text)}
               ></TextInput>
+            </View>
+
+            <View style={formStyle.inputItem}>
+              <Text style={modalStyle.filterLabel}>Logo da Empresa</Text>
+              <View style={formStyle.inputBox}>
+                {imageUri ? (
+                  <Image
+                    source={{ uri: imageUri }}
+                    style={formStyle.businessLogo}
+                  />
+                ) : (
+                  <View>
+                    <Ionicons name={"business"} size={80} color="#A88A44" />
+                  </View>
+                )}
+                <View style={{ flexDirection: "column" }}>
+                  <TouchableOpacity
+                    style={formStyle.imageOption}
+                    onPress={pickImageFromLibrary}
+                  >
+                    <Ionicons
+                      style={formStyle.iconButton}
+                      name="images-outline"
+                      size={30}
+                    />
+                    <Text style={formStyle.imageOptionLabel}>
+                      Escolher da galeria
+                    </Text>
+                  </TouchableOpacity>
+
+                  {imageUri && (
+                    <TouchableOpacity
+                      style={formStyle.imageOption}
+                      onPress={handleRemoveImage}
+                    >
+                      <Ionicons
+                        style={formStyle.iconDanger}
+                        name="trash-outline"
+                        size={30}
+                      />
+                      <Text style={formStyle.imageRemoveLabel}>
+                        Remover foto atual
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
             </View>
 
             <TouchableOpacity

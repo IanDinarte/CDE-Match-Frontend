@@ -30,7 +30,7 @@ export const modalStyle = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 15,
     paddingBottom: 40,
-    maxHeight: "80%", //so vai contar pros modais com scrollview
+    maxHeight: "100%", //so vai contar pros modais com scrollview
     width: "100%",
   },
   filterLabel: {

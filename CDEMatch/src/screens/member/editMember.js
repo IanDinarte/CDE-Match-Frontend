@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import api from "../../services/api";
 import {
   View,
@@ -7,10 +7,15 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
 import { colors } from "../../styles/colors";
 import { formStyle } from "../../styles/formStyle";
 import { modalStyle } from "../../styles/modalStyle";
@@ -25,6 +30,17 @@ export default function EditMemberScreen({ route }) {
 
   const [email, setEmail] = useState(member.email.value);
   const [emailConf, setEmailConf] = useState(member.email.confidential);
+  const [membership, setMembership] = useState(member.membership);
+  const [city, setCity] = useState(member.city);
+  const [description, setDescription] = useState(member.description);
+  const [businesses, setBusinesses] = useState([]);
+  const [websites, setWebsites] = useState(member.websites || []);
+  const [websiteName, setWebsiteName] = useState("");
+  const [websiteLink, setWebsiteLink] = useState("");
+
+  const [imageUri, setImageUri] = useState(member.profilePicture);
+  const [removeImageSignal, setRemoveImageSignal] = useState(false);
+  const [imageMenuVisible, setImageMenuVisible] = useState(false);
 
   /**
    * A mudança de senha consiste em: inserir senha antiga e a nova, em seguida
@@ -34,53 +50,223 @@ export default function EditMemberScreen({ route }) {
    * Isso é feito em separado do resto das edições e é mudado na hora,
    * independente do botão de aplicar alterações.
    */
+  const [changePasswordActive, setChangePasswordActive] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
 
-  /**
-   * membership em vez de ser pra mudar deve redirecionar para algum outro site
-   * onde ele pode fazer o upgrade da conta ou algo do genero.
-   */
-  const [membership, setMembership] = useState(member.membership);
-  const [city, setCity] = useState(member.city);
-  const [description, setDescription] = useState(member.description);
-  const [profilePicture, setProfilePicture] = useState(null);
-  const [businesses, setBusinesses] = useState([]);
-  const [websites, setWebsites] = useState([]);
-
-  const [changePasswordActive, setChangePasswordActive] = useState(false);
-
   const navigation = useNavigation();
 
-  const changePassword = () => {};
+  useEffect(() => {
+    const checkPendingResult = async () => {
+      const pendingResult = await ImagePicker.getPendingResultAsync();
 
-  const editMember = () => {
-    const memberData = {
-      name: name,
-      phone: phone,
-      phoneConfidential: phoneConf === true ? "on" : "off",
-      email: email,
-      emailConfidential: emailConf === true ? "on" : "off",
-      city: city,
-      description: description,
-      //profilepicture?
-      websites: websites,
+      if (
+        pendingResult &&
+        pendingResult.length > 0 &&
+        !pendingResult[0].canceled
+      ) {
+        setImageUri(pendingResult[0].assets[0].uri);
+        setRemoveImageSignal(false);
+      }
+    };
+
+    checkPendingResult();
+  }, []);
+
+  const handleAddWebsite = () => {
+    if (!websiteName.trim() || !websiteLink.trim()) {
+      Alert.alert("Campos vazios", "Insere o nome e o link do website.");
+      return;
+    }
+
+    if (websites.length >= 5) {
+      Alert.alert("Limite atingido", "Podes adicionar no máximo 5 websites.");
+      return;
+    }
+
+    const newWebsite = {
+      name: websiteName.trim(),
+      link: websiteLink.trim(),
+    };
+
+    setWebsites([...websites, newWebsite]);
+    setWebsiteName("");
+    setWebsiteLink("");
+  };
+
+  const handleRemoveWebsite = (indexToRemove) => {
+    const filteredWebsites = websites.filter(
+      (_, index) => index !== indexToRemove,
+    );
+    setWebsites(filteredWebsites);
+  };
+
+  const changePassword = () => {
+    if (!oldPassword || !newPassword || !repeatPassword) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos da senha.");
+      return;
+    }
+
+    if (newPassword !== repeatPassword) {
+      Alert.alert("Erro", "A nova senha e a repetição não coincidem.");
+      return;
+    }
+
+    const passwordData = {
+      oldPassword: oldPassword,
+      newPassword: newPassword,
+      repeatPassword: repeatPassword,
     };
 
     api
-      .patch(`api/member/${member._id}`, memberData)
-      .then(() => {
-        navigation.goBack();
+      .patch(`api/member/${member._id}/password`, passwordData)
+      .then((res) => {
+        Alert.alert("Sucesso", res.data || "Senha alterada com sucesso.");
+        setChangePasswordActive(false);
       })
       .catch((error) => {
-        console.log(error.message);
+        Alert.alert("Erro", error.response.data);
+        console.log(error.message + ": " + error.response.data);
       });
   };
 
+  const takePhoto = async () => {
+    setImageMenuVisible(false);
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert(
+        "Permissão necessária",
+        "Precisas de dar acesso à câmara para tirar uma foto.",
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+      cameraType: ImagePicker.CameraType.front,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+      setRemoveImageSignal(false);
+    }
+  };
+
+  const pickImageFromLibrary = async () => {
+    setImageMenuVisible(false);
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert(
+        "Permissão necessária",
+        "Precisas de dar acesso à galeria para escolher uma foto.",
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: (ImagePicker.MediaType = "images"),
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+      setRemoveImageSignal(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageMenuVisible(false);
+    setImageUri(null);
+    setRemoveImageSignal(true);
+  };
+
+  const editMember = () => {
+    const formData = new FormData();
+
+    formData.append("name", name);
+    formData.append("phone", phone);
+    formData.append("phoneConfidential", phoneConf === true ? "on" : "off");
+    formData.append("email", email);
+    formData.append("emailConfidential", emailConf === true ? "on" : "off");
+    formData.append("city", city);
+    formData.append("description", description);
+    websites.forEach((site) => {
+      formData.append("websiteNames", site.name);
+      formData.append("websiteLinks", site.link);
+    });
+    formData.append(
+      "removeProfilePicture",
+      removeImageSignal ? "true" : "false",
+    );
+
+    if (imageUri && imageUri !== member.profilePicture) {
+      const filename = imageUri.split("/").pop();
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : `image`;
+
+      formData.append("profilePicture", {
+        uri: imageUri,
+        name: filename,
+        type: type,
+      });
+    }
+
+    api
+      .patch(`api/member/${member._id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        Alert.alert("Sucesso", res.data || "Membro editado com sucesso.");
+        navigation.goBack();
+      })
+      .catch((error) => {
+        Alert.alert("Erro", error.response.data);
+        console.log(error.message + ": " + error.response.data);
+      });
+  };
+
+  const deactivateAccount = () => {
+    Alert.alert("Deseja desativar sua conta?", "bla bla bla", [
+      {
+        text: "Cancelar",
+        onPress: () => console.log("Cancelado"),
+        style: "cancel",
+      },
+      {
+        text: "Confirmar",
+        onPress: () => {
+          api
+            .patch(`api/member/${member._id}/deactivate`)
+            .then(() => {})
+            .catch((error) => {
+              Alert.alert("Error", error.response.data);
+              console.log(error.message + " " + error.response.data);
+            });
+        },
+        style: "destructive",
+      },
+    ]);
+  };
+
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView style={{ backgroundColor: colors.background }}>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={formStyle.formHeader}>
           <View style={formStyle.titleRow}>
             <TouchableOpacity
@@ -99,20 +285,26 @@ export default function EditMemberScreen({ route }) {
             </Text>
           </View>
 
-          <View style={formStyle.avatarContainer}>
-            {member.profilePicture ? (
+          <TouchableOpacity
+            style={formStyle.avatarContainer}
+            onPress={() => setImageMenuVisible(true)}
+          >
+            {imageUri ? (
               <Image
-                source={{ uri: member.profilePicture }}
+                source={{ uri: imageUri }}
                 style={formStyle.profilePictureInput}
               />
             ) : (
               <View style={formStyle.profilePictureInput}>
                 <Text style={formStyle.avatarText}>
-                  {member?.name ? member.name.charAt(0).toUpperCase() : "U"}
+                  {name ? name.charAt(0).toUpperCase() : "U"}
                 </Text>
               </View>
             )}
-          </View>
+            <View style={formStyle.imageButton}>
+              <Ionicons name="camera" size={30} color="#EEEEEE" />
+            </View>
+          </TouchableOpacity>
         </View>
 
         <View style={formStyle.formContainer}>
@@ -200,6 +392,87 @@ export default function EditMemberScreen({ route }) {
             ></TextInput>
           </View>
 
+          <View style={[formStyle.inputItem, { marginTop: 15 }]}>
+            <Text style={formStyle.inputLabel}>
+              Websites ({websites.length}/5)
+            </Text>
+
+            <View
+              style={{
+                backgroundColor: colors.cardBackground,
+                padding: 12,
+                borderRadius: 8,
+                gap: 10,
+              }}
+            >
+              <TextInput
+                style={formStyle.textInput}
+                placeholder="Nome do Website"
+                value={websiteName}
+                onChangeText={setWebsiteName}
+              />
+              <TextInput
+                style={formStyle.textInput}
+                placeholder="exemplo.com"
+                value={websiteLink}
+                onChangeText={setWebsiteLink}
+                autoCapitalize="none"
+                keyboardType="url"
+              />
+              <TouchableOpacity
+                style={[
+                  formStyle.actionButton,
+                  { marginTop: 5, width: "100%", justifyContent: "center" },
+                ]}
+                onPress={handleAddWebsite}
+              >
+                <Text style={formStyle.actionButtonText}>
+                  + Adicionar Website
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={{ marginTop: 10, gap: 8 }}>
+              {websites.map((site, index) => (
+                <View
+                  key={index}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    backgroundColor: colors.background,
+                    padding: 12,
+                    borderRadius: 6,
+                  }}
+                >
+                  <View style={{ flex: 1, marginRight: 10 }}>
+                    <Text
+                      style={{
+                        color: "#FFF",
+                        fontWeight: "bold",
+                        fontSize: 14,
+                      }}
+                    >
+                      {site.name}
+                    </Text>
+                    <Text
+                      style={{
+                        color: colors.primary || "#A88A44",
+                        fontSize: 12,
+                      }}
+                      numberOfLines={1}
+                    >
+                      {site.link}
+                    </Text>
+                  </View>
+                  <TouchableOpacity onPress={() => handleRemoveWebsite(index)}>
+                    <Ionicons name="trash-outline" size={22} color="#FF6B6B" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          </View>
+
           <View style={formStyle.inputItem}>
             <Text style={formStyle.inputLabel}>Seu Plano: {membership}</Text>
             {/* <View style={{ alignSelf: "center" }}> */}
@@ -216,7 +489,12 @@ export default function EditMemberScreen({ route }) {
             >
               <Text style={formStyle.actionButtonText}>Alterar Senha</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={formStyle.dangerButton} onPress={() => {}}>
+            <TouchableOpacity
+              style={formStyle.dangerButton}
+              onPress={() => {
+                deactivateAccount();
+              }}
+            >
               <Text style={formStyle.actionButtonText}>Desativar Conta</Text>
             </TouchableOpacity>
           </View>
@@ -249,6 +527,71 @@ export default function EditMemberScreen({ route }) {
       </View>
 
       <Modal
+        isVisible={imageMenuVisible}
+        onBackdropPress={() => setImageMenuVisible(false)}
+        onBackButtonPress={() => setImageMenuVisible(false)}
+        backdropOpacity={0.5}
+        backdropTransitionOutTiming={10}
+        style={{ margin: 0, justifyContent: "flex-end" }}
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
+        useNativeDriver={true}
+      >
+        <View style={[modalStyle.filterModalCard, { paddingBottom: 30 }]}>
+          <Text
+            style={[
+              modalStyle.modalTitle,
+              { textAlign: "center", marginBottom: 20 },
+            ]}
+          >
+            Foto de Perfil
+          </Text>
+
+          <TouchableOpacity style={formStyle.imageOption} onPress={takePhoto}>
+            <Ionicons
+              style={formStyle.iconButton}
+              name="camera-outline"
+              size={30}
+            />
+            <Text style={formStyle.imageOptionLabel}>Tirar nova foto</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={formStyle.imageOption}
+            onPress={pickImageFromLibrary}
+          >
+            <Ionicons
+              style={formStyle.iconButton}
+              name="images-outline"
+              size={30}
+            />
+            <Text style={formStyle.imageOptionLabel}>Escolher da galeria</Text>
+          </TouchableOpacity>
+
+          {imageUri && (
+            <TouchableOpacity
+              style={formStyle.imageOption}
+              onPress={handleRemoveImage}
+            >
+              <Ionicons
+                style={formStyle.iconDanger}
+                name="trash-outline"
+                size={30}
+              />
+              <Text style={formStyle.imageRemoveLabel}>Remover foto atual</Text>
+            </TouchableOpacity>
+          )}
+
+          <TouchableOpacity
+            style={formStyle.dangerButton}
+            onPress={() => setImageMenuVisible(false)}
+          >
+            <Text style={formStyle.actionButtonText}>Cancelar</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      <Modal
         isVisible={changePasswordActive}
         onBackdropPress={() => setChangePasswordActive(false)}
         onBackButtonPress={() => setChangePasswordActive(false)}
@@ -258,12 +601,13 @@ export default function EditMemberScreen({ route }) {
           setRepeatPassword("");
         }}
         backdropOpacity={0.6}
+        backdropTransitionOutTiming={10}
         style={{ margin: 0, justifyContent: "flex-end" }}
         animationIn="slideInUp"
-        animationOu="slideInDown"
+        animationOut="slideOutDown"
         useNativeDriver={true}
       >
-        <View style={modalStyle.filterModalCard}>
+        <View style={[modalStyle.filterModalCard]}>
           <View style={modalStyle.modalHeader}>
             <Text style={modalStyle.modalTitle}>Alterar Senha</Text>
             <TouchableOpacity onPress={() => setChangePasswordActive(false)}>
@@ -317,6 +661,6 @@ export default function EditMemberScreen({ route }) {
           </TouchableOpacity>
         </View>
       </Modal>
-    </View>
+    </KeyboardAvoidingView>
   );
 }

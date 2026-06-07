@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "../../services/api";
 import {
+  Alert,
   ScrollView,
   Text,
   TextInput,
@@ -45,11 +46,13 @@ export default function EditDealScreen({ route }) {
 
     api
       .patch(`api/deal/${route.params.deal._id}`, dealData)
-      .then(() => {
+      .then((res) => {
         navigation.goBack();
+        Alert.alert("Sucesso", res.data || "Negócio Editado com Sucesso");
       })
       .catch((error) => {
-        console.log(error.message);
+        Alert.alert("Error", error.response.data);
+        console.log(error.message + " " + error.response.data);
       });
   };
 
@@ -118,9 +121,10 @@ export default function EditDealScreen({ route }) {
               onBackdropPress={() => setSelectTypeActive(false)}
               onBackButtonPress={() => setSelectTypeActive(false)}
               backdropOpacity={0.6}
+              backdropTransitionOutTiming={10}
               style={{ margin: 0, justifyContent: "flex-end" }}
               animationIn="slideInUp"
-              animationOu="slideInDown"
+              animationOut="slideOutDown"
               useNativeDriver={true}
             >
               <View style={modalStyle.filterModalCard}>
@@ -169,9 +173,10 @@ export default function EditDealScreen({ route }) {
               onBackdropPress={() => setSelectAreaActive(false)}
               onBackButtonPress={() => setSelectAreaActive(false)}
               backdropOpacity={0.6}
+              backdropTransitionOutTiming={10}
               style={{ margin: 0, justifyContent: "flex-end" }}
               animationIn="slideInUp"
-              animationOu="slideInDown"
+              animationOut="slideOutDown"
               useNativeDriver={true}
             >
               <View style={modalStyle.filterModalCard}>
@@ -232,9 +237,10 @@ export default function EditDealScreen({ route }) {
               onBackdropPress={() => setSelectStateActive(false)}
               onBackButtonPress={() => setSelectStateActive(false)}
               backdropOpacity={0.6}
+              backdropTransitionOutTiming={10}
               style={{ margin: 0, justifyContent: "flex-end" }}
               animationIn="slideInUp"
-              animationOu="slideInDown"
+              animationOut="slideOutDown"
               useNativeDriver={true}
             >
               <View style={modalStyle.filterModalCard}>

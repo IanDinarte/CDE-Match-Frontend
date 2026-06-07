@@ -6,13 +6,15 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
+  Alert,
 } from "react-native";
+import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";
+import api from "../services/api";
+import * as ImagePicker from "expo-image-picker";
 import { memberStyle } from "../styles/memberStyle";
 import { formStyle } from "../styles/formStyle";
-import Modal from "react-native-modal";
 import { modalStyle } from "../styles/modalStyle";
-import api from "../services/api";
 
 export function BusinessCard({
   item,
@@ -28,37 +30,116 @@ export function BusinessCard({
     item.description,
   );
   const [businessArea, setBusinessArea] = useState(item.area);
-  const [businessLogo, setBusinessLogo] = useState("");
+  const [imageUri, setImageUri] = useState(item.logo);
+  const [removeImageSignal, setRemoveImageSignal] = useState(false);
+
+  const resetFormFields = () => {
+    setBusinessName(item.name);
+    setBusinessRole(item.role);
+    setBusinessDescription(item.description);
+    setBusinessArea(item.area);
+    setImageUri(item.logo);
+    setRemoveImageSignal(false);
+  };
+
+  const pickImageFromLibrary = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert(
+        "Permissão necessária",
+        "Precisas de dar acesso à galeria para escolher uma foto.",
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: (ImagePicker.MediaType = "images"),
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+      setRemoveImageSignal(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageUri(null);
+    setRemoveImageSignal(true);
+  };
 
   const editBusiness = () => {
     setEditBusinessActive(false);
 
-    const businessData = {
-      name: businessName,
-      role: businessRole,
-      description: businessDescription,
-      area: businessArea,
-    };
+    const formData = new FormData();
+
+    formData.append("name", businessName);
+    formData.append("role", businessRole);
+    formData.append("description", businessDescription);
+    formData.append("area", businessArea);
+    formData.append("removeLogo", removeImageSignal ? "true" : "false");
+
+    if (imageUri && imageUri !== item.logo) {
+      const filename = imageUri.split("/").pop();
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : `image`;
+
+      formData.append("logo", {
+        uri: imageUri,
+        name: filename,
+        type: type,
+      });
+    }
 
     api
-      .patch(`api/member/${ownerId}/business/${item._id}`, businessData)
-      .then(() => {
+      .patch(`api/member/${ownerId}/business/${item._id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        Alert.alert(
+          "Sucesso",
+          res.data || "Informações da Empresa alteradas com Sucesso.",
+        );
         if (onActionComplete) onActionComplete();
       })
       .catch((error) => {
-        console.log(error.message);
+        Alert.alert("Error", error.response.data);
+        console.log(error.message + " " + error.response.data);
       });
   };
 
   const deleteBusiness = () => {
-    api
-      .delete(`api/member/${ownerId}/business/${item._id}`)
-      .then(() => {
-        if (onActionComplete) onActionComplete();
-      })
-      .catch((error) => {
-        console.log(error.message);
-      });
+    Alert.alert(
+      "Eliminar Empresa",
+      "Tens a certeza que queres eliminar esta empresa? Esta ação não pode ser desfeita.",
+      [
+        {
+          text: "Cancelar",
+          onPress: () => console.log("Cancelado"),
+          style: "cancel",
+        },
+        {
+          text: "Eliminar",
+          onPress: () => {
+            api
+              .delete(`api/member/${ownerId}/business/${item._id}`)
+              .then(() => {
+                if (onActionComplete) onActionComplete();
+              })
+              .catch((error) => {
+                Alert.alert("Error", error.response.data);
+                console.log(error.message + " " + error.response.data);
+              });
+          },
+          style: "destructive",
+        },
+      ],
+    );
   };
 
   return (
@@ -70,7 +151,7 @@ export function BusinessCard({
         ></Image>
       ) : (
         <View>
-          <Ionicons name={"business"} size={40} color="#A88A44" />
+          <Ionicons name={"business"} size={60} color="#A88A44" />
         </View>
       )}
       <View style={memberStyle.cardInfo}>
@@ -104,10 +185,12 @@ export function BusinessCard({
         isVisible={editBusinessActive}
         onBackdropPress={() => setEditBusinessActive(false)}
         onBackButtonPress={() => setEditBusinessActive(false)}
+        onModalHide={resetFormFields}
         backdropOpacity={0.6}
+        backdropTransitionOutTiming={10}
         style={{ margin: 0, justifyContent: "flex-end" }}
         animationIn="slideInUp"
-        animationOu="slideInDown"
+        animationOut="slideOutDown"
         useNativeDriver={true}
       >
         <ScrollView style={modalStyle.filterModalCard}>
@@ -161,6 +244,53 @@ export function BusinessCard({
               value={businessArea}
               onChangeText={(text) => setBusinessArea(text)}
             ></TextInput>
+          </View>
+
+          <View style={formStyle.inputItem}>
+            <Text style={modalStyle.filterLabel}>Logo da Empresa</Text>
+            <View style={formStyle.inputBox}>
+              {imageUri ? (
+                <Image
+                  source={{ uri: imageUri }}
+                  style={formStyle.businessLogo}
+                />
+              ) : (
+                <View>
+                  <Ionicons name={"business"} size={80} color="#A88A44" />
+                </View>
+              )}
+              <View style={{ flexDirection: "column" }}>
+                <TouchableOpacity
+                  style={formStyle.imageOption}
+                  onPress={pickImageFromLibrary}
+                >
+                  <Ionicons
+                    style={formStyle.iconButton}
+                    name="images-outline"
+                    size={30}
+                  />
+                  <Text style={formStyle.imageOptionLabel}>
+                    Escolher da galeria
+                  </Text>
+                </TouchableOpacity>
+
+                {imageUri && (
+                  <TouchableOpacity
+                    style={formStyle.imageOption}
+                    onPress={handleRemoveImage}
+                  >
+                    <Ionicons
+                      style={formStyle.iconDanger}
+                      name="trash-outline"
+                      size={30}
+                    />
+                    <Text style={formStyle.imageRemoveLabel}>
+                      Remover foto atual
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
           </View>
 
           <TouchableOpacity

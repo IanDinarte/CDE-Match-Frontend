@@ -9,7 +9,7 @@ export const formStyle = StyleSheet.create({
     // height: 135,
     marginTop: 30,
     gap: 25,
-    position: "relative"
+    position: "relative",
   },
   titleRow: {
     flexDirection: "row",
@@ -25,7 +25,7 @@ export const formStyle = StyleSheet.create({
     fontSize: 25,
     flex: 1,
     flexWrap: "wrap",
-    paddingHorizontal: 30
+    paddingHorizontal: 30,
   },
   formContainer: {
     backgroundColor: colors.cardBackground,
@@ -36,7 +36,7 @@ export const formStyle = StyleSheet.create({
   },
   avatarContainer: {
     // position: "absolute",
-    marginBottom: -75, 
+    marginBottom: -75,
     // marginTop: 1,
     zIndex: 10,
     elevation: 10,
@@ -46,12 +46,13 @@ export const formStyle = StyleSheet.create({
   importantArea: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
+    marginTop: 10,
     marginBottom: 10,
   },
   cardActions: {
     flexDirection: "row",
     justifyContent: "flex-start",
+    gap: 20,
   },
   dangerActions: {
     flexDirection: "row",
@@ -87,7 +88,7 @@ export const formStyle = StyleSheet.create({
     color: colors.actionButton,
     alignSelf: "flex-start",
     alignItems: "center",
-    marginRight: 20,
+    // marginRight: 20,
   },
   iconDanger: {
     color: colors.danger,
@@ -95,7 +96,7 @@ export const formStyle = StyleSheet.create({
     alignItems: "center",
     // marginLeft: 20,
   },
-  backButtonContainer:{
+  backButtonContainer: {
     position: "absolute",
     left: 10,
     top: 0,
@@ -105,6 +106,35 @@ export const formStyle = StyleSheet.create({
     color: colors.actionButton,
     alignSelf: "flex-start",
     alignItems: "center",
+  },
+  imageButton: {
+    position: "absolute",
+    bottom: 1,
+    right: 1,
+    backgroundColor: colors.actionButton,
+    borderRadius: 30,
+    padding: 6,
+  },
+  imageOption: {
+    marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 15,
+  },
+  imageOptionLabel: {
+    color: colors.textSecondary,
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  imageRemoveLabel: {
+    color: colors.danger,
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  businessLogo: {
+    height: 80,
+    width: 80,
+    borderRadius: 20,
   },
 
   //inputs
@@ -156,5 +186,47 @@ export const formStyle = StyleSheet.create({
     fontSize: 60,
     fontWeight: "bold",
     color: colors.cardBackground,
+  },
+
+  //Camera
+  cameraOverlay: {
+    flex: 1,
+    backgroundColor: "transparent",
+    justifyContent: "space-between",
+    padding: 20,
+  },
+  closeButton: {
+    alignSelf: "flex-start",
+    // marginTop: 10,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    padding: 10,
+    borderRadius: 25,
+  },
+  actionRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+    paddingHorizontal: 20,
+  },
+  iconContainer: {
+    backgroundColor: "rgba(0,0,0,0.5)",
+    padding: 12,
+    borderRadius: 30,
+  },
+  captureButton: {
+    width: 74,
+    height: 74,
+    borderRadius: 37,
+    borderWidth: 4,
+    borderColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  captureButtonInner: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#fff",
   },
 });

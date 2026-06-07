@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { dealStyle } from "../../styles/dealStyle";
 import { colors } from "../../styles/colors";
@@ -32,7 +33,8 @@ export default function SuggestedDealsScreen() {
         setRefreshing(false);
       })
       .catch((error) => {
-        console.log("Erro ao carregar sugeridos:", error.message);
+        Alert.alert("Error", error.response.data);
+        console.log(error.message + " " + error.response.data);
         setLoading(false);
         setRefreshing(false);
       });

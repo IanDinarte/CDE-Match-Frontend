@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { dealStyle } from "../styles/dealStyle";
@@ -36,7 +37,8 @@ export function SuggestedDealCard({ item, onActionComplete }) {
         setLoading(false);
       })
       .catch((error) => {
-        console.log(error.message);
+        Alert.alert("Error", error.response.data);
+        console.log(error.message + " " + error.response.data);
         setLoading(false);
       });
   };
@@ -54,18 +56,39 @@ export function SuggestedDealCard({ item, onActionComplete }) {
           setSuggestedMemberIds((prevIds) => [...prevIds, memberId]);
         }
       })
-      .catch((error) => console.log(error.message));
+      .catch((error) => {
+        Alert.alert("Error", error.response.data);
+        console.log(error.message + " " + error.response.data);
+      });
   };
 
   const rejectSuggestion = () => {
-    api
-      .delete(`api/deal/suggestion/${item._id}`)
-      .then(() => {
-        if (onActionComplete) onActionComplete();
-      })
-      .catch((error) => {
-        console.log(error.message);
-      });
+    Alert.alert(
+      "Rejeitar Sugestão",
+      "Esta ação não pode ser desfeita.",
+      [
+        {
+          text: "Cancelar",
+          onPress: () => console.log("Cancelado"),
+          style: "cancel",
+        },
+        {
+          text: "Rejeitar",
+          onPress: () => {
+            api
+              .delete(`api/deal/suggestion/${item._id}`)
+              .then(() => {
+                if (onActionComplete) onActionComplete();
+              })
+              .catch((error) => {
+                Alert.alert("Error", error.response.data);
+                console.log(error.message + " " + error.response.data);
+              });
+          },
+          style: "destructive",
+        },
+      ],
+    );
   };
 
   return (
@@ -113,7 +136,7 @@ export function SuggestedDealCard({ item, onActionComplete }) {
       </TouchableOpacity>
 
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <View style={dealStyle.cardActions}>
+        <View style={formStyle.cardActions}>
           <TouchableOpacity>
             <Ionicons
               style={formStyle.iconButton}
@@ -155,9 +178,10 @@ export function SuggestedDealCard({ item, onActionComplete }) {
         onBackdropPress={() => setModalActive(false)}
         onBackButtonPress={() => setModalActive(false)}
         backdropOpacity={0.6}
+        backdropTransitionOutTiming={10}
         style={{ margin: 0, justifyContent: "flex-end" }}
         animationIn="slideInUp"
-        animationOu="slideInDown"
+        animationOut="slideOutDown"
         useNativeDriver={true}
       >
         <View style={dealStyle.suggestionListModalCard}>

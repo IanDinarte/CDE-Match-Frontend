@@ -45,8 +45,8 @@ export default function LoginScreen({ navigation }) {
       })
       .catch((error) => {
         setLoading(false);
-        console.log(error);
-        Alert.alert("Erro", "Email ou senha incorretos.");
+        Alert.alert("Error", error.response.data);
+        console.log(error.message + " " + error.response.data);
       });
   };
 

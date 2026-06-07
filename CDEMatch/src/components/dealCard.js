@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { dealStyle } from "../styles/dealStyle";
@@ -44,7 +45,8 @@ export function DealCard({ item }) {
         setLoading(false);
       })
       .catch((error) => {
-        console.log(error.message);
+        Alert.alert("Error", error.response.data);
+        console.log(error.message + " " + error.response.data);
         setLoading(false);
       });
   };
@@ -62,7 +64,10 @@ export function DealCard({ item }) {
           setSuggestedMemberIds((prevIds) => [...prevIds, memberId]);
         }
       })
-      .catch((error) => console.log(error.message));
+      .catch((error) => {
+        Alert.alert("Error", error.response.data);
+        console.log(error.message + " " + error.response.data);
+      });
   };
 
   return (
@@ -107,7 +112,7 @@ export function DealCard({ item }) {
         <Text style={dealStyle.dealDescription}>{item.description}</Text>
       </TouchableOpacity>
 
-      <View style={dealStyle.cardActions}>
+      <View style={formStyle.cardActions}>
         <TouchableOpacity>
           <Ionicons
             style={formStyle.iconButton}
@@ -138,9 +143,10 @@ export function DealCard({ item }) {
         onBackdropPress={() => setModalActive(false)}
         onBackButtonPress={() => setModalActive(false)}
         backdropOpacity={0.6}
+        backdropTransitionOutTiming={10}
         style={{ margin: 0, justifyContent: "flex-end" }}
         animationIn="slideInUp"
-        animationOu="slideInDown"
+        animationOut="slideOutDown"
         useNativeDriver={true}
       >
         <View style={modalStyle.suggestionListModalCard}>
@@ -149,7 +155,7 @@ export function DealCard({ item }) {
               Sugerir Negócio a outro Membro
             </Text>
             <TouchableOpacity onPress={() => setModalActive(false)}>
-              <Ionicons name="close" size={24} color="#EEE" />
+              <Ionicons name="close" size={25} color="#EEE" />
             </TouchableOpacity>
           </View>
           {loading && members.length === 0 ? (

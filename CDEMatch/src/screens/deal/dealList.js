@@ -8,6 +8,7 @@ import {
   TextInput,
   ActivityIndicator,
   RefreshControl,
+  Alert,
 } from "react-native";
 import Modal from "react-native-modal";
 import api from "../../services/api";
@@ -50,7 +51,8 @@ export default function DealListScreen() {
         setRefreshing(false);
       })
       .catch((error) => {
-        console.log(error.message);
+        Alert.alert("Error", error.response.data);
+        console.log(error.message + " " + error.response.data);
         setLoading(false);
         setRefreshing(false);
       });
@@ -89,9 +91,10 @@ export default function DealListScreen() {
           onBackdropPress={() => setFiltersActive(false)}
           onBackButtonPress={() => setFiltersActive(false)}
           backdropOpacity={0.6}
+          backdropTransitionOutTiming={10}
           style={{ margin: 0, justifyContent: "flex-end" }}
           animationIn="slideInUp"
-          animationOu="slideInDown"
+          animationOut="slideOutDown"
           useNativeDriver={true}
         >
           <View style={modalStyle.filterModalCard}>
@@ -112,7 +115,7 @@ export default function DealListScreen() {
                 onChangeText={(value) => setMinPrice(value)}
                 clearButtonMode="while-editing"
                 inputMode="decimal"
-                />
+              />
               <Text style={modalStyle.filterText}>até</Text>
               <TextInput
                 style={modalStyle.priceBox}

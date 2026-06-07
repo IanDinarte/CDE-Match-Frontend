@@ -8,6 +8,7 @@ import {
   ScrollView,
   Image,
   RefreshControl,
+  Alert,
 } from "react-native";
 import api from "../../services/api";
 import { Ionicons } from "@expo/vector-icons";
@@ -55,7 +56,8 @@ export default function DealDetailsScreen({ route }) {
         setLoading(false);
       })
       .catch((error) => {
-        console.log(error.message);
+        Alert.alert("Error", error.response.data);
+        console.log(error.message + " " + error.response.data);
         setLoading(false);
       });
   };
@@ -73,7 +75,10 @@ export default function DealDetailsScreen({ route }) {
           setSuggestedMemberIds((prevIds) => [...prevIds, memberId]);
         }
       })
-      .catch((error) => console.log(error.message));
+      .catch((error) => {
+        Alert.alert("Error", error.response.data);
+        console.log(error.message + " " + error.response.data);
+      });
   };
 
   const fetchDeal = () => {
@@ -227,9 +232,10 @@ export default function DealDetailsScreen({ route }) {
         onBackdropPress={() => setModalActive(false)}
         onBackButtonPress={() => setModalActive(false)}
         backdropOpacity={0.6}
+        backdropTransitionOutTiming={10}
         style={{ margin: 0, justifyContent: "flex-end" }}
         animationIn="slideInUp"
-        animationOu="slideInDown"
+        animationOut="slideOutDown"
         useNativeDriver={true}
       >
         <View style={modalStyle.suggestionListModalCard}>
