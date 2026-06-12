@@ -101,7 +101,7 @@ export default function LoginScreen({ navigation }) {
 
         <View style={loginStyle.footer}>
           <Image
-            source={require("../../assets/cde logo.png")}
+            source={require("../../assets/cde-logo.png")}
             style={loginStyle.footerLogo}
             resizeMode="contain"
           />

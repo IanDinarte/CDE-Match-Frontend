@@ -5,6 +5,7 @@ const port = 3000;
 
 const api = axios.create({
   baseURL: `http://192.168.1.72:${port}`,
+  timeout: 10000,
 });
 
 api.interceptors.request.use(

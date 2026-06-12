@@ -14,6 +14,7 @@ import Modal from "react-native-modal";
 import api from "../../services/api";
 import { Ionicons } from "@expo/vector-icons";
 import { globalStyles } from "../../styles/globalStyles";
+import { useFocusEffect } from "@react-navigation/native";
 import { dealStyle } from "../../styles/dealStyle";
 import { DealCard } from "../../components/dealCard";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -61,6 +62,12 @@ export default function DealListScreen() {
   useEffect(() => {
     fetchDeals();
   }, [searchText, selectedType, selectedArea, minPrice, maxPrice]);
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     fetchDeals();
+  //   }, [searchText, selectedType, selectedArea, minPrice, maxPrice]),
+  // );
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);

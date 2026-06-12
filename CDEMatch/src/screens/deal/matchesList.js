@@ -9,7 +9,9 @@ import {
   ActivityIndicator,
   RefreshControl,
   Alert,
+  DeviceEventEmitter,
 } from "react-native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import api from "../../services/api";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,11 +21,14 @@ import { DealCard } from "../../components/dealCard";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../../styles/colors";
 import { modalStyle } from "../../styles/modalStyle";
+import { formStyle } from "../../styles/formStyle";
 
 export default function MatchesListScreen() {
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  const navigation = useNavigation();
 
   const fetchDeals = () => {
     setLoading(true);
@@ -43,18 +48,45 @@ export default function MatchesListScreen() {
       });
   };
 
-  useEffect(() => {
-    fetchDeals();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchDeals();
+    }, []),
+  );
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchDeals();
   }, []);
 
+  // useEffect(() => {
+  //   const subscription = DeviceEventEmitter.addListener(
+  //     "updateMatchStatus",
+  //     (data) => {
+  //       if (data.isMatched === false) {
+  //         setDeals((currentDeals) =>
+  //           currentDeals.filter((deal) => deal._id !== data.dealId),
+  //         );
+  //       }
+  //     },
+  //   );
+  //   return () => subscription.remove();
+  // }, []);
+
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <View style={dealStyle.container}>
+      <View style={dealStyle.detailsHeaderContainer}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons
+            style={formStyle.backButton}
+            name="chevron-back-outline"
+            size={30}
+          />
+        </TouchableOpacity>
+        <Text style={dealStyle.detailTitle}>Seus Interesses</Text>
+      </View>
+
+      <View style={[dealStyle.container, { flex: 1 }]}>
         {loading && deals.length === 0 ? (
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}

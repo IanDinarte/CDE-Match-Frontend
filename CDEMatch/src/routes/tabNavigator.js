@@ -50,7 +50,7 @@ export default function TabNavigator() {
               iconName = focused ? "list" : "list-outline";
               break;
             case "Matches":
-              iconName = focused ? "heart" : "heart-outline";
+              iconName = focused ? "briefcase" : "briefcase-outline";
               break;
             case "Add":
               iconName = focused ? "add-circle" : "add-circle-outline";

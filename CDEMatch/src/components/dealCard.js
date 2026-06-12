@@ -8,6 +8,7 @@ import {
   Image,
   ActivityIndicator,
   Alert,
+  DeviceEventEmitter,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { dealStyle } from "../styles/dealStyle";
@@ -23,11 +24,10 @@ export function DealCard({ item }) {
   const [suggestedMemberIds, setSuggestedMemberIds] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [matched, setMatched] = useState(false);
+  const [matched, setMatched] = useState(item.isMatched || false);
 
   const navigation = useNavigation();
   const initial = item.owner ? item.owner.name.charAt(0).toUpperCase() : "M";
-
   const ownerId = item.owner?._id || item.owner;
 
   const loadMembers = () => {
@@ -72,6 +72,46 @@ export function DealCard({ item }) {
       });
   };
 
+  const onMatchButtonPress = () => {
+    const previousState = matched;
+
+    setMatched(!previousState);
+
+    DeviceEventEmitter.emit("updateMatchStatus", {
+      dealId: item._id,
+      isMatched: !previousState,
+    });
+
+    api
+      .post(`api/deal/match/${item._id}`)
+      .then(() => {
+
+      })
+      .catch((error) => {
+        setMatched(previousState);
+        DeviceEventEmitter.emit("updateMatchStatus", {
+          dealId: item._id,
+          isMatched: previousState,
+        });
+        Alert.alert("Error", error.response?.data || "Erro de ligação ao servidor.");
+        console.log(error.message + " " + error.response.data);
+      });
+  };
+
+  useEffect(() => {
+    setMatched(item.isMatched || false);
+
+    const subscription = DeviceEventEmitter.addListener(
+      "updateMatchStatus",
+      (data) => {
+        if (data.dealId === item._id) {
+          setMatched(data.isMatched);
+        }
+      },
+    );
+    return () => subscription.remove();
+  }, [item.isMatched, item._id]);
+
   return (
     <View style={dealStyle.card}>
       <View style={dealStyle.cardHeader}>
@@ -98,9 +138,6 @@ export function DealCard({ item }) {
             </Text>
           </View>
         </TouchableOpacity>
-        {/* <TouchableOpacity>
-          <Text style={dealStyle.optionsIcon}>⋮</Text>
-        </TouchableOpacity> */}
       </View>
 
       <TouchableOpacity
@@ -115,30 +152,25 @@ export function DealCard({ item }) {
       </TouchableOpacity>
 
       <View style={formStyle.cardActions}>
-        <TouchableOpacity>
-          <Ionicons
-            style={formStyle.iconButton}
-            name="heart-outline"
-            size={30}
-            color="#EEEEEE"
-          />
+        <TouchableOpacity onPress={() => onMatchButtonPress()}>
+          {matched ? (
+            <Ionicons style={formStyle.iconButton} name="briefcase" size={30} />
+          ) : (
+            <Ionicons
+              style={formStyle.iconButton}
+              name="briefcase-outline"
+              size={30}
+            />
+          )}
         </TouchableOpacity>
         <TouchableOpacity onPress={() => loadMembers()}>
           <Ionicons
             style={formStyle.iconButton}
             name="send-outline"
             size={30}
-            color="#EEEEEE"
+            // color="#EEEEEE"
           />
         </TouchableOpacity>
-        {/* <TouchableOpacity>
-          <Ionicons
-            style={formStyle.iconButton}
-            name="star-outline"
-            size={30}
-            color="#EEEEEE"
-          />
-        </TouchableOpacity> */}
       </View>
       <Modal
         isVisible={modalActive}

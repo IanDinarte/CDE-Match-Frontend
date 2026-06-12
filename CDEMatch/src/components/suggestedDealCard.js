@@ -8,6 +8,7 @@ import {
   Image,
   ActivityIndicator,
   Alert,
+  DeviceEventEmitter,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { dealStyle } from "../styles/dealStyle";
@@ -15,6 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import api from "../services/api";
 import { formStyle } from "../styles/formStyle";
+import { modalStyle } from "../styles/modalStyle";
 
 export function SuggestedDealCard({ item, onActionComplete }) {
   const [modalActive, setModalActive] = useState(false);
@@ -22,18 +24,28 @@ export function SuggestedDealCard({ item, onActionComplete }) {
   const [suggestedMemberIds, setSuggestedMemberIds] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [matched, setMatched] = useState(item.isMatched || false);
+
   const navigation = useNavigation();
   const initial = item.deal.owner
     ? item.deal.owner.name.charAt(0).toUpperCase()
-    : "U";
+    : "M";
+  const ownerId = item.deal.owner?._id || item.deal.owner;
 
   const loadMembers = () => {
     setModalActive(true);
+    setLoading(true);
 
     api
-      .get("api/member/")
+      .get(`api/member/suggest?dealId=${item.deal._id}&excludeId=${ownerId}`)
       .then((res) => {
-        setMembers(res.data);
+        const membersList =
+          res.data.members !== undefined ? res.data.members : res.data;
+        const suggestedIds = res.data.alreadySuggestedIds || [];
+
+        setMembers(membersList || []);
+        setSuggestedMemberIds(suggestedIds);
+
         setLoading(false);
       })
       .catch((error) => {
@@ -63,33 +75,70 @@ export function SuggestedDealCard({ item, onActionComplete }) {
   };
 
   const rejectSuggestion = () => {
-    Alert.alert(
-      "Rejeitar Sugestão",
-      "Esta ação não pode ser desfeita.",
-      [
-        {
-          text: "Cancelar",
-          onPress: () => console.log("Cancelado"),
-          style: "cancel",
+    Alert.alert("Rejeitar Sugestão", "Esta ação não pode ser desfeita.", [
+      {
+        text: "Cancelar",
+        onPress: () => console.log("Cancelado"),
+        style: "cancel",
+      },
+      {
+        text: "Rejeitar",
+        onPress: () => {
+          api
+            .delete(`api/deal/suggestion/${item._id}`)
+            .then(() => {
+              if (onActionComplete) onActionComplete();
+            })
+            .catch((error) => {
+              Alert.alert("Error", error.response.data);
+              console.log(error.message + " " + error.response.data);
+            });
         },
-        {
-          text: "Rejeitar",
-          onPress: () => {
-            api
-              .delete(`api/deal/suggestion/${item._id}`)
-              .then(() => {
-                if (onActionComplete) onActionComplete();
-              })
-              .catch((error) => {
-                Alert.alert("Error", error.response.data);
-                console.log(error.message + " " + error.response.data);
-              });
-          },
-          style: "destructive",
-        },
-      ],
-    );
+        style: "destructive",
+      },
+    ]);
   };
+
+  const onMatchButtonPress = () => {
+    const previousState = matched;
+
+    setMatched(!previousState);
+
+    DeviceEventEmitter.emit("updateMatchStatus", {
+      dealId: item.deal._id,
+      isMatched: !previousState,
+    });
+
+    api
+      .post(`api/deal/match/${item.deal._id}`)
+      .then(() => {})
+      .catch((error) => {
+        setMatched(previousState);
+        DeviceEventEmitter.emit("updateMatchStatus", {
+          dealId: item.deal._id,
+          isMatched: previousState,
+        });
+        Alert.alert(
+          "Error",
+          error.response?.data || "Erro de ligação ao servidor.",
+        );
+        console.log(error.message + " " + error.response.data);
+      });
+  };
+
+  useEffect(() => {
+    setMatched(item.deal.isMatched || false);
+
+    const subscription = DeviceEventEmitter.addListener(
+      "updateMatchStatus",
+      (data) => {
+        if (data.dealId === item.deal._id) {
+          setMatched(data.isMatched);
+        }
+      },
+    );
+    return () => subscription.remove();
+  }, [item.deal.isMatched, item.deal._id]);
 
   return (
     <View style={dealStyle.card}>
@@ -137,13 +186,20 @@ export function SuggestedDealCard({ item, onActionComplete }) {
 
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <View style={formStyle.cardActions}>
-          <TouchableOpacity>
-            <Ionicons
-              style={formStyle.iconButton}
-              name="heart-outline"
-              size={30}
-              color="#EEEEEE"
-            />
+          <TouchableOpacity onPress={() => onMatchButtonPress()}>
+            {matched ? (
+              <Ionicons
+                style={formStyle.iconButton}
+                name="briefcase"
+                size={30}
+              />
+            ) : (
+              <Ionicons
+                style={formStyle.iconButton}
+                name="briefcase-outline"
+                size={30}
+              />
+            )}
           </TouchableOpacity>
           <TouchableOpacity onPress={() => loadMembers()}>
             <Ionicons
@@ -184,7 +240,15 @@ export function SuggestedDealCard({ item, onActionComplete }) {
         animationOut="slideOutDown"
         useNativeDriver={true}
       >
-        <View style={dealStyle.suggestionListModalCard}>
+        <View style={modalStyle.suggestionListModalCard}>
+          <View style={modalStyle.modalHeader}>
+            <Text style={modalStyle.modalTitle}>
+              Sugerir Negócio a outro Membro
+            </Text>
+            <TouchableOpacity onPress={() => setModalActive(false)}>
+              <Ionicons name="close" size={25} color="#EEE" />
+            </TouchableOpacity>
+          </View>
           {loading && members.length === 0 ? (
             <View
               style={{
@@ -201,12 +265,10 @@ export function SuggestedDealCard({ item, onActionComplete }) {
               keyExtractor={(item) => item._id}
               contentContainerStyle={{ paddingBottom: 20 }}
               renderItem={({ item: member }) => {
-                const isSuggested = suggestedMemberIds.includes(
-                  member.id || member._id,
-                );
+                const isSuggested = suggestedMemberIds.includes(member.id);
 
                 return (
-                  <View key={member._id} style={dealStyle.memberCard}>
+                  <View key={member._id} style={modalStyle.memberCard}>
                     <View
                       style={{
                         flexDirection: "row",
@@ -218,20 +280,20 @@ export function SuggestedDealCard({ item, onActionComplete }) {
                       {member.profilePicture ? (
                         <Image
                           source={{ uri: member.profilePicture }}
-                          style={dealStyle.memberAvatar}
+                          style={modalStyle.memberAvatar}
                         />
                       ) : (
-                        <View style={dealStyle.memberAvatar}>
+                        <View style={modalStyle.memberAvatar}>
                           <Text style={dealStyle.avatarText}>
                             {member.name.charAt(0).toUpperCase() || "M"}
                           </Text>
                         </View>
                       )}
 
-                      <Text style={dealStyle.memberName}>{member.name}</Text>
+                      <Text style={modalStyle.memberName}>{member.name}</Text>
                     </View>
                     <TouchableOpacity
-                      style={dealStyle.sendButton}
+                      style={modalStyle.sendButton}
                       onPress={() => sendSuggestion(member.id)}
                       disabled={isSuggested}
                     >

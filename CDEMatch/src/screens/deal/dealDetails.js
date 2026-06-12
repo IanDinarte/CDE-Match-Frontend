@@ -9,6 +9,7 @@ import {
   Image,
   RefreshControl,
   Alert,
+  DeviceEventEmitter,
 } from "react-native";
 import api from "../../services/api";
 import { Ionicons } from "@expo/vector-icons";
@@ -34,6 +35,8 @@ export default function DealDetailsScreen({ route }) {
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  const [matched, setMatched] = useState(false);
 
   const isMyDeal = deal?.owner?._id === currentUserId;
 
@@ -88,6 +91,7 @@ export default function DealDetailsScreen({ route }) {
       .get(`api/deal/${id}`)
       .then((res) => {
         setDeal(res.data);
+        setMatched(res.data.isMatched || false);
         setLoading(false);
         setRefreshing(false);
       })
@@ -97,6 +101,45 @@ export default function DealDetailsScreen({ route }) {
         setRefreshing(false);
       });
   };
+
+  const onMatchButtonPress = () => {
+    const previousState = matched;
+
+    setMatched(!previousState);
+
+    DeviceEventEmitter.emit("updateMatchStatus", {
+      dealId: deal._id,
+      isMatched: !previousState,
+    });
+
+    api.post(`api/deal/match/${deal._id}`).catch((error) => {
+      setMatched(previousState);
+      DeviceEventEmitter.emit("updateMatchStatus", {
+        dealId: deal._id,
+        isMatched: previousState,
+      });
+      Alert.alert(
+        "Error",
+        error.response?.data || "Erro de ligação ao servidor.",
+      );
+      console.log(error.message + " " + error.response.data);
+    });
+  };
+
+  useEffect(() => {
+    if (!deal?._id) return;
+
+    const subscription = DeviceEventEmitter.addListener(
+      "updateMatchStatus",
+      (data) => {
+        if (data.dealId === deal._id) {
+          setMatched(data.isMatched);
+        }
+      },
+    );
+
+    return () => subscription.remove();
+  }, [deal?._id]);
 
   useFocusEffect(
     useCallback(() => {
@@ -193,13 +236,20 @@ export default function DealDetailsScreen({ route }) {
           <Text style={dealStyle.detailDescription}>{deal.description}</Text>
 
           <View style={formStyle.cardActions}>
-            <TouchableOpacity>
-              <Ionicons
-                style={formStyle.iconButton}
-                name="heart-outline"
-                size={30}
-                color="#EEEEEE"
-              />
+            <TouchableOpacity onPress={() => onMatchButtonPress()}>
+              {matched ? (
+                <Ionicons
+                  style={formStyle.iconButton}
+                  name="briefcase"
+                  size={30}
+                />
+              ) : (
+                <Ionicons
+                  style={formStyle.iconButton}
+                  name="briefcase-outline"
+                  size={30}
+                />
+              )}
             </TouchableOpacity>
             <TouchableOpacity onPress={() => loadMembers()}>
               <Ionicons
