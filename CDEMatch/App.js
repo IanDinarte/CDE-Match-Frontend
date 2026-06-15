@@ -7,9 +7,9 @@ import {
   FlatList,
   ActivityIndicator,
 } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 
 // importar screens da app
 import LoginScreen from "./src/screens/loginScreen.js";

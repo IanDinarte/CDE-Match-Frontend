@@ -18,24 +18,24 @@ import api from "../services/api";
 import { modalStyle } from "../styles/modalStyle";
 import { formStyle } from "../styles/formStyle";
 
-export function DealCard({ item }) {
+export function DealCard({ deal }) {
   const [modalActive, setModalActive] = useState(false);
   const [members, setMembers] = useState([]);
   const [suggestedMemberIds, setSuggestedMemberIds] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [matched, setMatched] = useState(item.isMatched || false);
+  const [matched, setMatched] = useState(deal.isMatched || false);
 
   const navigation = useNavigation();
-  const initial = item.owner ? item.owner.name.charAt(0).toUpperCase() : "M";
-  const ownerId = item.owner?._id || item.owner;
+  const initial = deal.owner ? deal.owner.name.charAt(0).toUpperCase() : "M";
+  const ownerId = deal.owner?._id || deal.owner;
 
   const loadMembers = () => {
     setModalActive(true);
     setLoading(true);
 
     api
-      .get(`api/member/suggest?dealId=${item._id}&excludeId=${ownerId}`)
+      .get(`api/member/suggest?dealId=${deal._id}&excludeId=${ownerId}`)
       .then((res) => {
         const membersList =
           res.data.members !== undefined ? res.data.members : res.data;
@@ -55,7 +55,7 @@ export function DealCard({ item }) {
 
   const sendSuggestion = (memberId) => {
     const suggestionData = {
-      dealId: item._id,
+      dealId: deal._id,
       suggestedTo: memberId,
     };
 
@@ -78,39 +78,40 @@ export function DealCard({ item }) {
     setMatched(!previousState);
 
     DeviceEventEmitter.emit("updateMatchStatus", {
-      dealId: item._id,
+      dealId: deal._id,
       isMatched: !previousState,
     });
 
     api
-      .post(`api/deal/match/${item._id}`)
-      .then(() => {
-
-      })
+      .post(`api/deal/match/${deal._id}`)
+      .then(() => {})
       .catch((error) => {
         setMatched(previousState);
         DeviceEventEmitter.emit("updateMatchStatus", {
-          dealId: item._id,
+          dealId: deal._id,
           isMatched: previousState,
         });
-        Alert.alert("Error", error.response?.data || "Erro de ligação ao servidor.");
+        Alert.alert(
+          "Error",
+          error.response?.data || "Erro de ligação ao servidor.",
+        );
         console.log(error.message + " " + error.response.data);
       });
   };
 
   useEffect(() => {
-    setMatched(item.isMatched || false);
+    setMatched(deal.isMatched || false);
 
     const subscription = DeviceEventEmitter.addListener(
       "updateMatchStatus",
       (data) => {
-        if (data.dealId === item._id) {
+        if (data.dealId === deal._id) {
           setMatched(data.isMatched);
         }
       },
     );
     return () => subscription.remove();
-  }, [item.isMatched, item._id]);
+  }, [deal.isMatched, deal._id]);
 
   return (
     <View style={dealStyle.card}>
@@ -118,12 +119,12 @@ export function DealCard({ item }) {
         <TouchableOpacity
           style={dealStyle.headerLeft}
           onPress={() =>
-            navigation.navigate("MemberProfile", { id: item.owner?._id })
+            navigation.navigate("ProfileStack", { id: deal.owner?._id })
           }
         >
-          {item.owner?.profilePicture ? (
+          {deal.owner?.profilePicture ? (
             <Image
-              source={{ uri: item.owner?.profilePicture }}
+              source={{ uri: deal.owner?.profilePicture }}
               style={dealStyle.avatar}
             ></Image>
           ) : (
@@ -134,44 +135,56 @@ export function DealCard({ item }) {
 
           <View>
             <Text style={dealStyle.userName}>
-              {item.owner.name || "Utilizador"}
+              {deal.owner.name || "Utilizador"}
             </Text>
           </View>
         </TouchableOpacity>
+        {deal.state === "Fechado" ? (
+          <Ionicons name="checkmark-circle" size={32} color="#2e8432" />
+        ) : (
+          deal.state === "Cancelado" && (
+            <Ionicons name="close-circle" size={32} color="#912828" />
+          )
+        )}
       </View>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate("DealDetails", { id: item._id })}
+        onPress={() => navigation.navigate("DealDetails", { id: deal._id })}
       >
-        <Text style={dealStyle.dealTitle}>{item.title}</Text>
+        <Text style={dealStyle.dealTitle}>{deal.title}</Text>
         <Text style={dealStyle.dealInfo}>
-          {item.type}, {item.area}
+          {deal.type}, {deal.area}
         </Text>
-        <Text style={dealStyle.dealInfo}>{item.price} €</Text>
-        <Text style={dealStyle.dealDescription}>{item.description}</Text>
+        <Text style={dealStyle.dealInfo}>{deal.price} €</Text>
+        <Text style={dealStyle.dealDescription}>{deal.description}</Text>
       </TouchableOpacity>
 
-      <View style={formStyle.cardActions}>
-        <TouchableOpacity onPress={() => onMatchButtonPress()}>
-          {matched ? (
-            <Ionicons style={formStyle.iconButton} name="briefcase" size={30} />
-          ) : (
+      {deal.state == "Disponivel" && (
+        <View style={formStyle.cardActions}>
+          <TouchableOpacity onPress={() => onMatchButtonPress()}>
+            {matched ? (
+              <Ionicons
+                style={formStyle.iconButton}
+                name="briefcase"
+                size={30}
+              />
+            ) : (
+              <Ionicons
+                style={formStyle.iconButton}
+                name="briefcase-outline"
+                size={30}
+              />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => loadMembers()}>
             <Ionicons
               style={formStyle.iconButton}
-              name="briefcase-outline"
+              name="send-outline"
               size={30}
             />
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => loadMembers()}>
-          <Ionicons
-            style={formStyle.iconButton}
-            name="send-outline"
-            size={30}
-            // color="#EEEEEE"
-          />
-        </TouchableOpacity>
-      </View>
+          </TouchableOpacity>
+        </View>
+      )}
       <Modal
         isVisible={modalActive}
         onBackdropPress={() => setModalActive(false)}

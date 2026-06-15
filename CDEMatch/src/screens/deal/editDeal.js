@@ -33,6 +33,32 @@ export default function EditDealScreen({ route }) {
 
   const navigation = useNavigation();
 
+  const deleteDeal = () => {
+    Alert.alert("Deletar Deal", "Esta ação não pode ser desfeita.", [
+      {
+        text: "Cancelar",
+        onPress: () => console.log("Cancelado"),
+        style: "cancel",
+      },
+      {
+        text: "Deletar",
+        onPress: () => {
+          api
+            .delete(`api/deal/${route.params.deal._id}`)
+            .then((res) => {
+              Alert.alert("Sucesso", res.data);
+              navigation.goBack();
+            })
+            .catch((error) => {
+              Alert.alert("Error", error.response.data);
+              console.log(error.message + " " + error.response.data);
+            });
+        },
+        style: "destructive",
+      },
+    ]);
+  };
+
   const editDeal = () => {
     const dealData = {
       title: title,
@@ -288,6 +314,19 @@ export default function EditDealScreen({ route }) {
                 )}
               </TouchableOpacity>
             </View>
+
+            {state === "Cancelado" && (
+              <View style={[dealStyle.inputBox, { marginTop: 10 }]}>
+                <TouchableOpacity
+                  style={dealStyle.dangerButton}
+                  onPress={() => deleteDeal()}
+                >
+                  <Text style={dealStyle.actionButtonText}>
+                    Deletar Negócio
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         </View>
       </ScrollView>

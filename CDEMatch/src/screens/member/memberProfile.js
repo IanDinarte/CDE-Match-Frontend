@@ -355,7 +355,7 @@ export default function MemberProfileScreen({ route }) {
           <View style={dealStyle.listContent}>
             {member?.deals && member.deals.length > 0 ? (
               member.deals.map((item) => (
-                <DealCard key={item._id} item={item} />
+                <DealCard key={item._id} deal={item} />
               ))
             ) : (
               <Text

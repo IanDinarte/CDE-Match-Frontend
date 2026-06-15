@@ -21,7 +21,6 @@ export const dealStyle = StyleSheet.create({
     color: colors.textMain,
     fontSize: 16,
     flex: 1,
-    // alignItems: "center"
   },
   listContent: {
     padding: 16,
@@ -188,8 +187,6 @@ export const dealStyle = StyleSheet.create({
     marginTop: 8,
     marginBottom: 16,
   },
-
-  //filtros
 
   //createDeal COLOCAR NO FORMSTYLE
   inputItem: {

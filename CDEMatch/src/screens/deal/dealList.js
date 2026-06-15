@@ -32,6 +32,7 @@ export default function DealListScreen() {
   const [selectedArea, setSelectedArea] = useState("Todas");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [matchFilter, setMatchFilter] = useState("Todos"); //"Todos", "Matched", "Unmatched"
 
   const fetchDeals = () => {
     setLoading(true);
@@ -42,6 +43,7 @@ export default function DealListScreen() {
       area: selectedArea,
       minPrice: minPrice,
       maxPrice: maxPrice,
+      matchFilter: matchFilter,
     }).toString();
 
     api
@@ -61,18 +63,12 @@ export default function DealListScreen() {
 
   useEffect(() => {
     fetchDeals();
-  }, [searchText, selectedType, selectedArea, minPrice, maxPrice]);
-
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     fetchDeals();
-  //   }, [searchText, selectedType, selectedArea, minPrice, maxPrice]),
-  // );
+  }, [searchText, selectedType, selectedArea, minPrice, maxPrice, matchFilter]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchDeals();
-  }, [searchText, selectedType, selectedArea, minPrice, maxPrice]);
+  }, [searchText, selectedType, selectedArea, minPrice, maxPrice, matchFilter]);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -103,7 +99,7 @@ export default function DealListScreen() {
           <FlatList
             data={deals}
             keyExtractor={(item) => item._id}
-            renderItem={({ item }) => <DealCard item={item} />}
+            renderItem={({ item }) => <DealCard deal={item} />}
             contentContainerStyle={dealStyle.listContent}
             refreshControl={
               <RefreshControl
@@ -223,6 +219,36 @@ export default function DealListScreen() {
                     ]}
                   >
                     {area}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          <Text style={modalStyle.filterLabel}>Interesse</Text>
+          <View style={modalStyle.chipContainer}>
+            {[
+              { label: "Todos", value: 0 },
+              { label: "Interessados", value: 1 },
+              { label: "Por Ver", value: 2 },
+            ].map((option) => {
+              const isSelected = matchFilter === option.value;
+              return (
+                <TouchableOpacity
+                  key={option.value}
+                  style={[
+                    modalStyle.chip,
+                    isSelected && modalStyle.chipSelected,
+                  ]}
+                  onPress={() => setMatchFilter(option.value)}
+                >
+                  <Text
+                    style={[
+                      modalStyle.chipText,
+                      isSelected && modalStyle.chipTextSelected,
+                    ]}
+                  > 
+                    {option.label}
                   </Text>
                 </TouchableOpacity>
               );

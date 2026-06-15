@@ -208,7 +208,7 @@ export default function DealDetailsScreen({ route }) {
             <TouchableOpacity
               style={dealStyle.headerLeft}
               onPress={() =>
-                navigation.navigate("MemberProfile", { id: deal.owner?._id })
+                navigation.navigate("ProfileStack", { id: deal.owner?._id })
               }
             >
               {deal.owner?.profilePicture ? (

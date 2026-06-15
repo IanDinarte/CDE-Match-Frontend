@@ -6,14 +6,13 @@ import { globalStyles } from "../styles/globalStyles";
 import { colors } from "../styles/colors";
 import { createStackNavigator } from "@react-navigation/stack";
 
-//import das telas que vao ser incluidas no toolbar
-// import MyProfileScreen from "../screens/member/myProfile";
 import EditMemberScreen from "../screens/member/editMember";
 import MemberProfileScreen from "../screens/member/memberProfile";
+import MemberListScreen from "../screens/member/memberList";
 
 import DealListScreen from "../screens/deal/dealList";
 import DealDetailsScreen from "../screens/deal/dealDetails";
-import MatchesListScreen from "../screens/deal/matchesList";
+// import MatchesListScreen from "../deprecated/matchesList";
 import SuggestedDealsScreen from "../screens/deal/suggestedDeals";
 import CreateDealScreen from "../screens/deal/createDeal";
 import EditDealScreen from "../screens/deal/editDeal";
@@ -21,7 +20,8 @@ import EditDealScreen from "../screens/deal/editDeal";
 const ProfileStack = createStackNavigator();
 const DealStack = createStackNavigator();
 const SuggestionStack = createStackNavigator();
-const MatchesStack = createStackNavigator();
+const MemberStack = createStackNavigator();
+// const MatchesStack = createStackNavigator();
 
 const PlaceHolderScreen = () => (
   <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -49,8 +49,8 @@ export default function TabNavigator() {
             case "List":
               iconName = focused ? "list" : "list-outline";
               break;
-            case "Matches":
-              iconName = focused ? "briefcase" : "briefcase-outline";
+            case "Search":
+              iconName = focused ? "search" : "search-outline";
               break;
             case "Add":
               iconName = focused ? "add-circle" : "add-circle-outline";
@@ -71,9 +71,9 @@ export default function TabNavigator() {
       })}
     >
       <Tab.Screen name="List" component={DealStackNavigation} />
-      <Tab.Screen name="Matches" component={MatchesStackNavigation} />
-      <Tab.Screen name="Add" component={CreateDealScreen} />
       <Tab.Screen name="Messages" component={SuggestionStackNavigation} />
+      <Tab.Screen name="Add" component={CreateDealScreen} />
+      <Tab.Screen name="Search" component={MemberStackNavigation} />
       <Tab.Screen name="Profile" component={ProfileStackNavigation} />
     </Tab.Navigator>
   );
@@ -84,23 +84,25 @@ function DealStackNavigation() {
     <DealStack.Navigator screenOptions={{ headerShown: false }}>
       <DealStack.Screen name="DealList" component={DealListScreen} />
       <DealStack.Screen name="DealDetails" component={DealDetailsScreen} />
-      <DealStack.Screen name="MemberProfile" component={MemberProfileScreen} />
-      <DealStack.Screen name="EditMember" component={EditMemberScreen} />
       <DealStack.Screen name="EditDeal" component={EditDealScreen} />
+      <DealStack.Screen
+        name="ProfileStack"
+        component={ProfileStackNavigation}
+      />
     </DealStack.Navigator>
   );
 }
 
-function MatchesStackNavigation(){
-  return(
-    <MatchesStack.Navigator screenOptions={{headerShown: false}}>
-      <MatchesStack.Screen name="MatchesList" component={MatchesListScreen}/>
-      <MatchesStack.Screen name="DealDetails" component={DealDetailsScreen}/>
-      <MatchesStack.Screen name="MemberProfile" component={MemberProfileScreen}/>
-      <MatchesStack.Screen name="EditMember" component={EditMemberScreen}/>
-      <MatchesStack.Screen name="EditDeal" component={EditDealScreen}/>
-    </MatchesStack.Navigator>
-  )
+function MemberStackNavigation() {
+  return (
+    <MemberStack.Navigator screenOptions={{ headerShown: false }}>
+      <MemberStack.Screen name="MemberList" component={MemberListScreen} />
+      <MemberStack.Screen
+        name="ProfileStack"
+        component={ProfileStackNavigation}
+      />
+    </MemberStack.Navigator>
+  );
 }
 
 function ProfileStackNavigation() {
@@ -110,7 +112,6 @@ function ProfileStackNavigation() {
         name="MemberProfile"
         component={MemberProfileScreen}
       />
-      {/* <ProfileStack.Screen name="MyProfile" component={MyProfileScreen} /> */}
       <ProfileStack.Screen name="EditMember" component={EditMemberScreen} />
       <ProfileStack.Screen name="DealDetails" component={DealDetailsScreen} />
       <ProfileStack.Screen name="EditDeal" component={EditDealScreen} />
@@ -130,11 +131,9 @@ function SuggestionStackNavigation() {
         component={DealDetailsScreen}
       />
       <SuggestionStack.Screen
-        name="MemberProfile"
-        component={MemberProfileScreen}
+        name="ProfileStack"
+        component={ProfileStackNavigation}
       />
-      <SuggestionStack.Screen name="EditMember" component={EditMemberScreen} />
-      <SuggestionStack.Screen name="EditDeal" component={EditDealScreen} />
     </SuggestionStack.Navigator>
   );
 }

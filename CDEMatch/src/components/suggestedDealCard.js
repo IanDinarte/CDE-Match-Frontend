@@ -146,7 +146,7 @@ export function SuggestedDealCard({ item, onActionComplete }) {
         <TouchableOpacity
           style={dealStyle.headerLeft}
           onPress={() =>
-            navigation.navigate("MemberProfile", { id: item.deal.owner?._id })
+            navigation.navigate("ProfileStack", { id: item.deal.owner?._id })
           }
         >
           {item.deal.owner?.profilePicture ? (

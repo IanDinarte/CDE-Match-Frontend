@@ -4,15 +4,44 @@ import { colors } from "../styles/colors";
 export const memberStyle = StyleSheet.create({
   memberCard: {
     backgroundColor: colors.cardBackground,
-    padding: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 20,
+    padding: 10,
     borderRadius: 8,
-    marginBottom: 12,
+    marginBottom: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
     elevation: 2,
   },
+  cardImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+    backgroundColor: colors.cardBackground,
+  },
+  cardAvatar: {
+    // marginTop: 25,
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+    backgroundColor: colors.avatarBackground,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  cardAvatarText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: colors.cardBackground,
+  },
+  cardName: {
+    fontSize: 16,
+    fontWeight: "medium",
+    color: colors.textPrimary,
+  },
+
   memberName: {
     fontSize: 18,
     fontWeight: "bold",

@@ -4,7 +4,8 @@ import axios from "axios";
 const port = 3000;
 
 const api = axios.create({
-  baseURL: `http://192.168.1.72:${port}`,
+  // baseURL: `http://192.168.1.72:${port}`,
+  baseURL: "https://cde-match-backend.onrender.com",
   timeout: 10000,
 });
 
