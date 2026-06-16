@@ -11,9 +11,7 @@ export function MemberCard({ member }) {
     <View>
       <TouchableOpacity
         style={memberStyle.memberCard}
-        onPress={() =>
-          navigation.navigate("ProfileStack", { id: member.id })
-        }
+        onPress={() => navigation.navigate("MemberProfile", { id: member._id })}
       >
         {member.profilePicture ? (
           <Image

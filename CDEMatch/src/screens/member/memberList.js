@@ -60,6 +60,7 @@ export default function MemberListScreen() {
           <TextInput
             style={dealStyle.searchBar}
             placeholder="Procurar Membro"
+            placeholderTextColor={colors.placeholder}
             value={searchText}
             onChangeText={(text) => setSearchText(text)}
             clearButtonMode="while-editing"

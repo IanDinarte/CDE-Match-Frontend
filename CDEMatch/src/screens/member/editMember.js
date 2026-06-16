@@ -19,6 +19,7 @@ import * as ImagePicker from "expo-image-picker";
 import { colors } from "../../styles/colors";
 import { formStyle } from "../../styles/formStyle";
 import { modalStyle } from "../../styles/modalStyle";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function EditMemberScreen({ route }) {
   const { member } = route.params;
@@ -56,6 +57,7 @@ export default function EditMemberScreen({ route }) {
   const [repeatPassword, setRepeatPassword] = useState("");
 
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     const checkPendingResult = async () => {
@@ -537,7 +539,12 @@ export default function EditMemberScreen({ route }) {
         animationOut="slideOutDown"
         useNativeDriver={true}
       >
-        <View style={[modalStyle.filterModalCard, { paddingBottom: 30 }]}>
+        <View
+          style={[
+            modalStyle.filterModalCard,
+            { paddingBottom: Math.max(insets.bottom, 20) },
+          ]}
+        >
           <Text
             style={[
               modalStyle.modalTitle,
@@ -607,7 +614,12 @@ export default function EditMemberScreen({ route }) {
         animationOut="slideOutDown"
         useNativeDriver={true}
       >
-        <View style={[modalStyle.filterModalCard]}>
+        <View
+          style={[
+            modalStyle.filterModalCard,
+            { paddingBottom: Math.max(insets.bottom, 20) },
+          ]}
+        >
           <View style={modalStyle.modalHeader}>
             <Text style={modalStyle.modalTitle}>Alterar Senha</Text>
             <TouchableOpacity onPress={() => setChangePasswordActive(false)}>

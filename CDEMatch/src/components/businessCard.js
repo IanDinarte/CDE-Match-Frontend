@@ -15,6 +15,7 @@ import * as ImagePicker from "expo-image-picker";
 import { memberStyle } from "../styles/memberStyle";
 import { formStyle } from "../styles/formStyle";
 import { modalStyle } from "../styles/modalStyle";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export function BusinessCard({
   item,
@@ -32,6 +33,8 @@ export function BusinessCard({
   const [businessArea, setBusinessArea] = useState(item.area);
   const [imageUri, setImageUri] = useState(item.logo);
   const [removeImageSignal, setRemoveImageSignal] = useState(false);
+
+  const insets = useSafeAreaInsets();
 
   const resetFormFields = () => {
     setBusinessName(item.name);
@@ -193,7 +196,12 @@ export function BusinessCard({
         animationOut="slideOutDown"
         useNativeDriver={true}
       >
-        <ScrollView style={modalStyle.filterModalCard}>
+        <ScrollView
+          style={[
+            modalStyle.filterModalCard,
+            { paddingBottom: Math.max(insets.bottom, 20) },
+          ]}
+        >
           <View style={modalStyle.modalHeader}>
             <Text style={modalStyle.modalTitle}>Editar Empresa</Text>
             <TouchableOpacity onPress={() => setEditBusinessActive(false)}>

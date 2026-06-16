@@ -85,10 +85,8 @@ function DealStackNavigation() {
       <DealStack.Screen name="DealList" component={DealListScreen} />
       <DealStack.Screen name="DealDetails" component={DealDetailsScreen} />
       <DealStack.Screen name="EditDeal" component={EditDealScreen} />
-      <DealStack.Screen
-        name="ProfileStack"
-        component={ProfileStackNavigation}
-      />
+      <DealStack.Screen name="MemberProfile" component={MemberProfileScreen} />
+      <DealStack.Screen name="EditMember" component={EditMemberScreen} />
     </DealStack.Navigator>
   );
 }
@@ -98,9 +96,12 @@ function MemberStackNavigation() {
     <MemberStack.Navigator screenOptions={{ headerShown: false }}>
       <MemberStack.Screen name="MemberList" component={MemberListScreen} />
       <MemberStack.Screen
-        name="ProfileStack"
-        component={ProfileStackNavigation}
+        name="MemberProfile"
+        component={MemberProfileScreen}
       />
+      <MemberStack.Screen name="EditMember" component={EditMemberScreen} />
+      <MemberStack.Screen name="DealDetails" component={DealDetailsScreen} />
+      <MemberStack.Screen name="EditDeal" component={EditDealScreen} />
     </MemberStack.Navigator>
   );
 }
@@ -131,9 +132,10 @@ function SuggestionStackNavigation() {
         component={DealDetailsScreen}
       />
       <SuggestionStack.Screen
-        name="ProfileStack"
-        component={ProfileStackNavigation}
+        name="MemberProfile"
+        component={MemberProfileScreen}
       />
+      <SuggestionStack.Screen name="EditMember" component={EditMemberScreen} />
     </SuggestionStack.Navigator>
   );
 }

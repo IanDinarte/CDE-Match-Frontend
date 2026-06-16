@@ -16,6 +16,7 @@ import { globalStyles } from "../styles/globalStyles";
 import { loginStyle } from "../styles/loginStyle";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { colors } from "../styles/colors";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -66,6 +67,7 @@ export default function LoginScreen({ navigation }) {
             <TextInput
               style={loginStyle.input}
               placeholder="Email"
+              placeholderTextColor={colors.placeholder}
               keyboardType="email-address"
               autoCapitalize="none"
               value={email}
@@ -75,6 +77,7 @@ export default function LoginScreen({ navigation }) {
             <TextInput
               style={loginStyle.input}
               placeholder="Password"
+              placeholderTextColor={colors.placeholder}
               secureTextEntry
               autoCapitalize="none"
               value={password}

@@ -15,6 +15,7 @@ import { colors } from "../../styles/colors";
 import { dealStyle } from "../../styles/dealStyle";
 import { modalStyle } from "../../styles/modalStyle";
 import { formStyle } from "../../styles/formStyle";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function EditDealScreen({ route }) {
   const [title, setTitle] = useState(route.params.deal.title);
@@ -32,6 +33,7 @@ export default function EditDealScreen({ route }) {
   const [selectStateActive, setSelectStateActive] = useState(false);
 
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
 
   const deleteDeal = () => {
     Alert.alert("Deletar Deal", "Esta ação não pode ser desfeita.", [
@@ -153,7 +155,12 @@ export default function EditDealScreen({ route }) {
               animationOut="slideOutDown"
               useNativeDriver={true}
             >
-              <View style={modalStyle.filterModalCard}>
+              <View
+                style={[
+                  modalStyle.filterModalCard,
+                  { paddingBottom: Math.max(insets.bottom, 20) },
+                ]}
+              >
                 <Text style={modalStyle.filterLabel}>
                   Selecione o Tipo de Negócio
                 </Text>
@@ -205,7 +212,12 @@ export default function EditDealScreen({ route }) {
               animationOut="slideOutDown"
               useNativeDriver={true}
             >
-              <View style={modalStyle.filterModalCard}>
+              <View
+                style={[
+                  modalStyle.filterModalCard,
+                  { paddingBottom: Math.max(insets.bottom, 20) },
+                ]}
+              >
                 <Text style={modalStyle.filterLabel}>
                   Selecione a Area do Negócio
                 </Text>
@@ -269,7 +281,12 @@ export default function EditDealScreen({ route }) {
               animationOut="slideOutDown"
               useNativeDriver={true}
             >
-              <View style={modalStyle.filterModalCard}>
+              <View
+                style={[
+                  modalStyle.filterModalCard,
+                  { paddingBottom: Math.max(insets.bottom, 20) },
+                ]}
+              >
                 <Text style={modalStyle.filterLabel}>
                   Selecione o Estado do Negócio
                 </Text>

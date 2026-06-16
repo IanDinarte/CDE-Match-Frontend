@@ -44,7 +44,7 @@ export const loginStyle = StyleSheet.create({
   },
   input: {
     backgroundColor: colors.inputBackground,
-    color: colors.inputText,
+    color: colors.textInput,
     borderRadius: 18,
     paddingHorizontal: 20,
     paddingVertical: 15,

@@ -27,6 +27,7 @@ import Modal from "react-native-modal";
 import { formStyle } from "../../styles/formStyle";
 import { modalStyle } from "../../styles/modalStyle";
 import { colors } from "../../styles/colors";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 /**
  *
@@ -57,6 +58,8 @@ export default function MemberProfileScreen({ route }) {
   const initialLetter = member?.name
     ? member.name.charAt(0).toUpperCase()
     : "U";
+
+  const insets = useSafeAreaInsets();
 
   const resetFormFields = () => {
     setBusinessName("");
@@ -340,16 +343,18 @@ export default function MemberProfileScreen({ route }) {
                 Esse Membro não possui Empresas
               </Text>
             )}
-            <TouchableOpacity
-              style={{ alignSelf: "center" }}
-              onPress={() => setAddBusinessActive(!addBusinessActive)}
-            >
-              <Ionicons
-                style={formStyle.iconButton}
-                name="add-circle-outline"
-                size={40}
-              />
-            </TouchableOpacity>
+            {isMyProfile && (
+              <TouchableOpacity
+                style={{ alignSelf: "center" }}
+                onPress={() => setAddBusinessActive(!addBusinessActive)}
+              >
+                <Ionicons
+                  style={formStyle.iconButton}
+                  name="add-circle-outline"
+                  size={40}
+                />
+              </TouchableOpacity>
+            )}
           </View>
         ) : (
           <View style={dealStyle.listContent}>
@@ -380,7 +385,12 @@ export default function MemberProfileScreen({ route }) {
           animationOut="slideOutDown"
           useNativeDriver={true}
         >
-          <ScrollView style={modalStyle.filterModalCard}>
+          <ScrollView
+            style={[
+              modalStyle.filterModalCard,
+              { paddingBottom: Math.max(insets.bottom, 20) },
+            ]}
+          >
             <View style={modalStyle.modalHeader}>
               <Text style={modalStyle.modalTitle}>Adicionar Empresa</Text>
               <TouchableOpacity onPress={() => setAddBusinessActive(false)}>

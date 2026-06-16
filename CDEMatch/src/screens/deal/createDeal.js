@@ -15,6 +15,7 @@ import { colors } from "../../styles/colors";
 import { dealStyle } from "../../styles/dealStyle";
 import { modalStyle } from "../../styles/modalStyle";
 import { formStyle } from "../../styles/formStyle";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function CreateDealScreen() {
   const [title, setTitle] = useState("");
@@ -27,6 +28,7 @@ export default function CreateDealScreen() {
   const [selectTypeActive, setSelectTypeActive] = useState(false);
   const [selectAreaActive, setSelectAreaActive] = useState(false);
 
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation();
 
   const createDeal = () => {
@@ -133,7 +135,12 @@ export default function CreateDealScreen() {
               animationOut="slideOutDown"
               useNativeDriver={true}
             >
-              <View style={modalStyle.filterModalCard}>
+              <View
+                style={[
+                  modalStyle.filterModalCard,
+                  { paddingBottom: Math.max(insets.bottom, 20) },
+                ]}
+              >
                 <Text style={modalStyle.filterLabel}>
                   Selecione o Tipo de Negócio
                 </Text>
@@ -185,7 +192,12 @@ export default function CreateDealScreen() {
               animationOut="slideOutDown"
               useNativeDriver={true}
             >
-              <View style={modalStyle.filterModalCard}>
+              <View
+                style={[
+                  modalStyle.filterModalCard,
+                  { paddingBottom: Math.max(insets.bottom, 20) },
+                ]}
+              >
                 <Text style={modalStyle.filterLabel}>
                   Selecione a Area do Negócio
                 </Text>

@@ -22,6 +22,7 @@ import { jwtDecode } from "jwt-decode";
 import { colors } from "../../styles/colors";
 import { formStyle } from "../../styles/formStyle";
 import { modalStyle } from "../../styles/modalStyle";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function DealDetailsScreen({ route }) {
   const { id } = route.params;
@@ -39,6 +40,8 @@ export default function DealDetailsScreen({ route }) {
   const [matched, setMatched] = useState(false);
 
   const isMyDeal = deal?.owner?._id === currentUserId;
+
+  const insets = useSafeAreaInsets();
 
   const loadMembers = () => {
     setModalActive(true);
@@ -208,7 +211,7 @@ export default function DealDetailsScreen({ route }) {
             <TouchableOpacity
               style={dealStyle.headerLeft}
               onPress={() =>
-                navigation.navigate("ProfileStack", { id: deal.owner?._id })
+                navigation.navigate("MemberProfile", { id: deal.owner?._id })
               }
             >
               {deal.owner?.profilePicture ? (
@@ -288,7 +291,12 @@ export default function DealDetailsScreen({ route }) {
         animationOut="slideOutDown"
         useNativeDriver={true}
       >
-        <View style={modalStyle.suggestionListModalCard}>
+        <View
+          style={[
+            modalStyle.suggestionListModalCard,
+            { paddingBottom: Math.max(insets.bottom, 20) },
+          ]}
+        >
           <View style={modalStyle.modalHeader}>
             <Text style={modalStyle.modalTitle}>
               Sugerir Negócio a outro Membro

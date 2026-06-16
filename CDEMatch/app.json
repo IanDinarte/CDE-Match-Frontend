@@ -16,7 +16,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.yourcompany.yourappname",
+      "package": "pt.clubedoempreendedor.cdematch",
       "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -34,6 +34,12 @@
       "eas": {
         "projectId": "2a859fd0-fba0-492d-8871-532bac5aa4ed"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/2a859fd0-fba0-492d-8871-532bac5aa4ed"
     }
   }
 }

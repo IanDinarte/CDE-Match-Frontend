@@ -17,6 +17,7 @@ import Modal from "react-native-modal";
 import api from "../services/api";
 import { modalStyle } from "../styles/modalStyle";
 import { formStyle } from "../styles/formStyle";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export function DealCard({ deal }) {
   const [modalActive, setModalActive] = useState(false);
@@ -29,6 +30,8 @@ export function DealCard({ deal }) {
   const navigation = useNavigation();
   const initial = deal.owner ? deal.owner.name.charAt(0).toUpperCase() : "M";
   const ownerId = deal.owner?._id || deal.owner;
+
+  const insets = useSafeAreaInsets();
 
   const loadMembers = () => {
     setModalActive(true);
@@ -119,7 +122,7 @@ export function DealCard({ deal }) {
         <TouchableOpacity
           style={dealStyle.headerLeft}
           onPress={() =>
-            navigation.navigate("ProfileStack", { id: deal.owner?._id })
+            navigation.navigate("MemberProfile", { id: deal.owner?._id })
           }
         >
           {deal.owner?.profilePicture ? (
@@ -196,7 +199,12 @@ export function DealCard({ deal }) {
         animationOut="slideOutDown"
         useNativeDriver={true}
       >
-        <View style={modalStyle.suggestionListModalCard}>
+        <View
+          style={[
+            modalStyle.suggestionListModalCard,
+            { paddingBottom: Math.max(insets.bottom, 20) },
+          ]}
+        >
           <View style={modalStyle.modalHeader}>
             <Text style={modalStyle.modalTitle}>
               Sugerir Negócio a outro Membro

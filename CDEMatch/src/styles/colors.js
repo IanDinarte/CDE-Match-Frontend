@@ -11,6 +11,7 @@ export const colors = {
   avatarBackground: "#C3C3C3",
   actionButton: "#967841",
   inputBackground: "#D9D9D9",
+  placeholder: "#313131",
   gray: "#8B949E",
   danger: "#781515",
 };
