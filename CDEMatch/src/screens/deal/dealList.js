@@ -77,7 +77,7 @@ export default function DealListScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaView style={dealStyle.container}>
+      <SafeAreaView style={[dealStyle.container, { flex: 1 }]}>
         <View style={dealStyle.searchBarContainer}>
           <TextInput
             style={dealStyle.searchBar}

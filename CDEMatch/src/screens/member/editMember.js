@@ -315,6 +315,7 @@ export default function EditMemberScreen({ route }) {
             <TextInput
               style={formStyle.textInput}
               placeholder="Nome"
+              placeholderTextColor={colors.placeholder}
               value={name}
               onChangeText={(text) => setName(text)}
             ></TextInput>
@@ -325,6 +326,7 @@ export default function EditMemberScreen({ route }) {
             <TextInput
               style={formStyle.textInput}
               placeholder="+351"
+              placeholderTextColor={colors.placeholder}
               value={phone}
               onChangeText={(text) => setPhone(text)}
               inputMode="tel"
@@ -351,6 +353,7 @@ export default function EditMemberScreen({ route }) {
             <TextInput
               style={formStyle.textInput}
               placeholder="exemplo@email.com"
+              placeholderTextColor={colors.placeholder}
               value={email}
               onChangeText={(text) => setEmail(text)}
             ></TextInput>
@@ -376,6 +379,7 @@ export default function EditMemberScreen({ route }) {
             <TextInput
               style={formStyle.textInput}
               placeholder="Cidade"
+              placeholderTextColor={colors.placeholder}
               value={city}
               onChangeText={(text) => setCity(text)}
             ></TextInput>
@@ -386,6 +390,7 @@ export default function EditMemberScreen({ route }) {
             <TextInput
               style={formStyle.multilineInput}
               placeholder="Descrição"
+              placeholderTextColor={colors.placeholder}
               multiline
               numberOfLines={5}
               maxLength={300}
@@ -410,12 +415,14 @@ export default function EditMemberScreen({ route }) {
               <TextInput
                 style={formStyle.textInput}
                 placeholder="Nome do Website"
+                placeholderTextColor={colors.placeholder}
                 value={websiteName}
                 onChangeText={setWebsiteName}
               />
               <TextInput
                 style={formStyle.textInput}
                 placeholder="exemplo.com"
+                placeholderTextColor={colors.placeholder}
                 value={websiteLink}
                 onChangeText={setWebsiteLink}
                 autoCapitalize="none"

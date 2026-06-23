@@ -47,7 +47,7 @@ export default function LoginScreen({ navigation }) {
       .catch((error) => {
         setLoading(false);
         Alert.alert("Error", error.response.data);
-        console.log(error.message + " " + error.response.data);
+        console.log(error.message + ": " + error.response.data);
       });
   };
 

@@ -25,7 +25,8 @@
       "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      // "baseUrl": "/cdematch.pt/",
     },
     "plugins": [
       "expo-web-browser"
@@ -40,6 +41,9 @@
     },
     "updates": {
       "url": "https://u.expo.dev/2a859fd0-fba0-492d-8871-532bac5aa4ed"
+    },
+    "experiments": {
+      "baseUrl": "/cdematch.pt/"
     }
   }
 }

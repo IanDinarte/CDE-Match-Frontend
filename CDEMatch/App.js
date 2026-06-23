@@ -6,6 +6,7 @@ import {
   View,
   FlatList,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
@@ -14,6 +15,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 // importar screens da app
 import LoginScreen from "./src/screens/loginScreen.js";
 import TabNavigator from "./src/routes/tabNavigator.js";
+import { colors } from "./src/styles/colors.js";
 
 const Stack = createStackNavigator();
 
@@ -26,17 +28,35 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
-        <StatusBar style="light" />
-
-        <Stack.Navigator
-          initialRouteName="Login"
-          screenOptions={{ headerShown: false }}
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.cardBackground,
+          alignItems: Platform.OS === "web" ? "center" : "stretch",
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            width: "100%",
+            maxWidth: Platform.OS === "web" ? 450 : "100%",
+            backgroundColor: colors.background,
+            overflow: "hidden",
+          }}
         >
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="MainApp" component={TabNavigator} />
-        </Stack.Navigator>
-      </NavigationContainer>
+          <NavigationContainer>
+            <StatusBar style="light" />
+
+            <Stack.Navigator
+              initialRouteName="Login"
+              screenOptions={{ headerShown: false }}
+            >
+              <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="MainApp" component={TabNavigator} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </View>
+      </View>
     </SafeAreaProvider>
   );
 }

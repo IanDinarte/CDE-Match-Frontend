@@ -84,6 +84,7 @@ export default function CreateDealScreen() {
               <TextInput
                 style={dealStyle.textInput}
                 placeholder="Titulo..."
+                placeholderTextColor={colors.placeholder}
                 value={title}
                 onChangeText={(text) => setTitle(text)}
               />
@@ -94,6 +95,7 @@ export default function CreateDealScreen() {
               <TextInput
                 style={dealStyle.multilineInput}
                 placeholder="Descrição..."
+                placeholderTextColor={colors.placeholder}
                 multiline
                 numberOfLines={5}
                 maxLength={300}
@@ -107,6 +109,7 @@ export default function CreateDealScreen() {
               <TextInput
                 style={dealStyle.textInput}
                 placeholder="€"
+                placeholderTextColor={colors.placeholder}
                 value={price}
                 onChangeText={(value) => setPrice(value)}
                 inputMode="decimal"
