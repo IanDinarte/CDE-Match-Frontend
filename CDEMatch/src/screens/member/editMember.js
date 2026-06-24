@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, createElement } from "react";
 import api from "../../services/api";
 import {
   View,
@@ -185,6 +185,18 @@ export default function EditMemberScreen({ route }) {
     }
   };
 
+  const takePhotoWeb = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (!permission.granted) {
+      window.alert(
+        "Permissão necessária. Precisas de dar acesso à câmara para tirar uma foto.",
+      );
+      return;
+    }
+    
+  };
+
   const pickImageFromLibrary = async () => {
     setImageMenuVisible(false);
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -216,7 +228,7 @@ export default function EditMemberScreen({ route }) {
     setRemoveImageSignal(true);
   };
 
-  const editMember = () => {
+  const editMember = async () => {
     const formData = new FormData();
 
     formData.append("name", name);
@@ -236,15 +248,22 @@ export default function EditMemberScreen({ route }) {
     );
 
     if (imageUri && imageUri !== member.profilePicture) {
-      const filename = imageUri.split("/").pop();
-      const match = /\.(\w+)$/.exec(filename);
-      const type = match ? `image/${match[1]}` : `image`;
+      if (Platform.OS === "web") {
+        const response = await fetch(imageUri);
+        const blob = await response.blob();
 
-      formData.append("profilePicture", {
-        uri: imageUri,
-        name: filename,
-        type: type,
-      });
+        formData.append("profilePicture", blob, "upload.jpg");
+      } else {
+        const filename = imageUri.split("/").pop();
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : `image`;
+
+        formData.append("profilePicture", {
+          uri: imageUri,
+          name: filename,
+          type: type,
+        });
+      }
     }
 
     api
@@ -335,26 +354,47 @@ export default function EditMemberScreen({ route }) {
               </Text>
             </View>
 
-            <TouchableOpacity
-              style={formStyle.avatarContainer}
-              onPress={() => setImageMenuVisible(true)}
-            >
-              {imageUri ? (
-                <Image
-                  source={{ uri: imageUri }}
-                  style={formStyle.profilePictureInput}
-                />
-              ) : (
-                <View style={formStyle.profilePictureInput}>
-                  <Text style={formStyle.avatarText}>
-                    {name ? name.charAt(0).toUpperCase() : "U"}
-                  </Text>
+            <View style={formStyle.avatarContainer}>
+              <TouchableOpacity onPress={() => setImageMenuVisible(true)}>
+                {imageUri ? (
+                  <Image
+                    source={{ uri: imageUri }}
+                    style={formStyle.profilePictureInput}
+                  />
+                ) : (
+                  <View style={formStyle.profilePictureInput}>
+                    <Text style={formStyle.avatarText}>
+                      {name ? name.charAt(0).toUpperCase() : "U"}
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+
+              {Platform.OS === "web" ? (
+                <View>
+                  {/* <TouchableOpacity
+                    onPress={() => takePhotoWeb(true)}
+                    style={formStyle.cameraButton}
+                  >
+                    <Ionicons name="camera" size={30} color="#EEEEEE" />
+                  </TouchableOpacity> */}
+
+                  <TouchableOpacity
+                    onPress={() => setImageMenuVisible(true)}
+                    style={formStyle.imageButton}
+                  >
+                    <Ionicons name="images" size={30} color="#EEEEEE" />
+                  </TouchableOpacity>
                 </View>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => setImageMenuVisible(true)}
+                  style={formStyle.imageButton}
+                >
+                  <Ionicons name="camera" size={30} color="#EEEEEE" />
+                </TouchableOpacity>
               )}
-              <View style={formStyle.imageButton}>
-                <Ionicons name="camera" size={30} color="#EEEEEE" />
-              </View>
-            </TouchableOpacity>
+            </View>
           </View>
 
           <View style={formStyle.formContainer}>
@@ -627,14 +667,16 @@ export default function EditMemberScreen({ route }) {
             Foto de Perfil
           </Text>
 
-          <TouchableOpacity style={formStyle.imageOption} onPress={takePhoto}>
-            <Ionicons
-              style={formStyle.iconButton}
-              name="camera-outline"
-              size={30}
-            />
-            <Text style={formStyle.imageOptionLabel}>Tirar nova foto</Text>
-          </TouchableOpacity>
+          {Platform.OS !== "web" && (
+            <TouchableOpacity style={formStyle.imageOption} onPress={takePhoto}>
+              <Ionicons
+                style={formStyle.iconButton}
+                name="camera-outline"
+                size={30}
+              />
+              <Text style={formStyle.imageOptionLabel}>Tirar nova foto</Text>
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity
             style={formStyle.imageOption}

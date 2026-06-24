@@ -100,7 +100,7 @@ export default function MemberProfileScreen({ route }) {
     setImageUri(null);
   };
 
-  const addBusiness = () => {
+  const addBusiness = async () => {
     setAddBusinessActive(false);
 
     const formData = new FormData();
@@ -111,15 +111,22 @@ export default function MemberProfileScreen({ route }) {
     formData.append("area", businessArea);
 
     if (imageUri) {
-      const filename = imageUri.split("/").pop();
-      const match = /\.(\w+)$/.exec(filename);
-      const type = match ? `image/${match[1]}` : `image`;
+      if (Platform.OS === "web") {
+        const response = await fetch(imageUri);
+        const blob = await response.blob();
 
-      formData.append("logo", {
-        uri: imageUri,
-        name: filename,
-        type: type,
-      });
+        formData.append("logo", blob, "upload.jpg");
+      } else {
+        const filename = imageUri.split("/").pop();
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : `image`;
+
+        formData.append("logo", {
+          uri: imageUri,
+          name: filename,
+          type: type,
+        });
+      }
     }
 
     api
@@ -128,7 +135,7 @@ export default function MemberProfileScreen({ route }) {
           "Content-Type": "multipart/form-data",
         },
       })
-      .then(() => {
+      .then((res) => {
         fetchMember();
         Alert.alert("Sucesso", res.data || "Empresa Adicionada.");
         resetFormFields();
@@ -452,6 +459,7 @@ export default function MemberProfileScreen({ route }) {
                 <TextInput
                   style={formStyle.textInput}
                   placeholder="Nome da Empresa"
+                  placeholderTextColor={colors.placeholder}
                   value={businessName}
                   onChangeText={(text) => setBusinessName(text)}
                 ></TextInput>
@@ -464,6 +472,7 @@ export default function MemberProfileScreen({ route }) {
                 <TextInput
                   style={formStyle.textInput}
                   placeholder="Cargo"
+                  placeholderTextColor={colors.placeholder}
                   value={businessRole}
                   onChangeText={(text) => setBusinessRole(text)}
                 ></TextInput>
@@ -476,6 +485,7 @@ export default function MemberProfileScreen({ route }) {
                 <TextInput
                   style={formStyle.multilineInput}
                   placeholder="Descrição"
+                  placeholderTextColor={colors.placeholder}
                   multiline
                   numberOfLines={5}
                   maxLength={300}
@@ -491,6 +501,7 @@ export default function MemberProfileScreen({ route }) {
                 <TextInput
                   style={formStyle.textInput}
                   placeholder="Area"
+                  placeholderTextColor={colors.placeholder}
                   value={businessArea}
                   onChangeText={(text) => setBusinessArea(text)}
                 ></TextInput>

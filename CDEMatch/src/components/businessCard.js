@@ -75,7 +75,7 @@ export function BusinessCard({
     setRemoveImageSignal(true);
   };
 
-  const editBusiness = () => {
+  const editBusiness = async () => {
     setEditBusinessActive(false);
 
     const formData = new FormData();
@@ -87,15 +87,22 @@ export function BusinessCard({
     formData.append("removeLogo", removeImageSignal ? "true" : "false");
 
     if (imageUri && imageUri !== item.logo) {
-      const filename = imageUri.split("/").pop();
-      const match = /\.(\w+)$/.exec(filename);
-      const type = match ? `image/${match[1]}` : `image`;
+      if (Platform.OS === "web") {
+        const response = await fetch(imageUri);
+        const blob = await response.blob();
 
-      formData.append("logo", {
-        uri: imageUri,
-        name: filename,
-        type: type,
-      });
+        formData.append("logo", blob, "upload.jpg");
+      } else {
+        const filename = imageUri.split("/").pop();
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : `image`;
+
+        formData.append("logo", {
+          uri: imageUri,
+          name: filename,
+          type: type,
+        });
+      }
     }
 
     api

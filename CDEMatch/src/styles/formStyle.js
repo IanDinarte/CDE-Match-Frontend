@@ -120,6 +120,14 @@ export const formStyle = StyleSheet.create({
     borderRadius: 30,
     padding: 6,
   },
+  cameraButton: {
+    position: "absolute",
+    bottom: 1,
+    left: 1,
+    backgroundColor: colors.actionButton,
+    borderRadius: 30,
+    padding: 6,
+  },
   imageOption: {
     marginBottom: 20,
     flexDirection: "row",

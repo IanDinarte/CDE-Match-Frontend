@@ -25,36 +25,36 @@ const linkingConfig = {
   config: {
     path: "cdematch",
     screens: {
-      Login: "login",
+      Login: "",
       MainApp: {
         path: "",
         screens: {
           List: {
-            path: "deals",
+            // path: "deals",
             screens: {
               DealList: "",
-              DealDetails: "details",
-              EditDeal: "edit-deal",
+              DealDetails: "",
+              EditDeal: "",
             },
           },
           Messages: {
-            path: "messages",
+            // path: "messages",
             screens: {
               SuggestedDeals: "",
             },
           },
-          Add: "add",
+          Add: "",
           Search: {
-            path: "search",
+            // path: "search",
             screens: {
               MemberList: "",
             },
           },
           Profile: {
-            path: "profile",
+            // path: "profile",
             screens: {
               MemberProfile: "",
-              EditMember: "edit-profile",
+              EditMember: "",
             },
           },
         },
