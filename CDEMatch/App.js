@@ -11,6 +11,7 @@ import {
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { navigationRef } from "./src/services/navigationRef.js";
 
 // importar screens da app
 import LoginScreen from "./src/screens/loginScreen.js";
@@ -18,6 +19,49 @@ import TabNavigator from "./src/routes/tabNavigator.js";
 import { colors } from "./src/styles/colors.js";
 
 const Stack = createStackNavigator();
+
+const linkingConfig = {
+  prefixes: ["https://vanytime.pt/cdematch/", "cdematch://"],
+  config: {
+    path: "cdematch",
+    screens: {
+      Login: "login",
+      MainApp: {
+        path: "",
+        screens: {
+          List: {
+            path: "deals",
+            screens: {
+              DealList: "",
+              DealDetails: "details",
+              EditDeal: "edit-deal",
+            },
+          },
+          Messages: {
+            path: "messages",
+            screens: {
+              SuggestedDeals: "",
+            },
+          },
+          Add: "add",
+          Search: {
+            path: "search",
+            screens: {
+              MemberList: "",
+            },
+          },
+          Profile: {
+            path: "profile",
+            screens: {
+              MemberProfile: "",
+              EditMember: "edit-profile",
+            },
+          },
+        },
+      },
+    },
+  },
+};
 
 /**
  * NavigationContainer: engloba toda a estrutura de rotas da app
@@ -44,7 +88,7 @@ export default function App() {
             overflow: "hidden",
           }}
         >
-          <NavigationContainer>
+          <NavigationContainer ref={navigationRef} linking={linkingConfig}>
             <StatusBar style="light" />
 
             <Stack.Navigator

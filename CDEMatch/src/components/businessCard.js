@@ -7,6 +7,7 @@ import {
   ScrollView,
   TextInput,
   Alert,
+  Platform,
 } from "react-native";
 import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";
@@ -111,38 +112,61 @@ export function BusinessCard({
         if (onActionComplete) onActionComplete();
       })
       .catch((error) => {
-        Alert.alert("Error", error.response.data);
-        console.log(error.message + " " + error.response.data);
+        const errorMsg = error.response?.data || "Ocorreu um erro";
+        if (Platform.OS === "web") {
+          window.alert("Error: " + errorMsg);
+        } else {
+          Alert.alert("Error", errorMsg);
+        }
+        console.log(error.message + " " + errorMsg);
       });
   };
 
   const deleteBusiness = () => {
-    Alert.alert(
-      "Eliminar Empresa",
-      "Tens a certeza que queres eliminar esta empresa? Esta ação não pode ser desfeita.",
-      [
-        {
-          text: "Cancelar",
-          onPress: () => console.log("Cancelado"),
-          style: "cancel",
-        },
-        {
-          text: "Eliminar",
-          onPress: () => {
-            api
-              .delete(`api/member/${ownerId}/business/${item._id}`)
-              .then(() => {
-                if (onActionComplete) onActionComplete();
-              })
-              .catch((error) => {
-                Alert.alert("Error", error.response.data);
-                console.log(error.message + " " + error.response.data);
-              });
+    const execDelete = () => {
+      api
+        .delete(`api/member/${ownerId}/business/${item._id}`)
+        .then(() => {
+          if (onActionComplete) onActionComplete();
+        })
+        .catch((error) => {
+          const errorMsg = error.response?.data || "Ocorreu um erro";
+          if (Platform.OS === "web") {
+            window.alert("Error: " + errorMsg);
+          } else {
+            Alert.alert("Error", errorMsg);
+          }
+          console.log(error.message + " " + errorMsg);
+        });
+    };
+
+    if (Platform.OS === "web") {
+      const confirmDelete = window.confirm(
+        "Tens a certeza que queres eliminar esta empresa? Esta ação não pode ser desfeita.",
+      );
+      if (confirmDelete) {
+        execDelete();
+      } else {
+        console.log("Cancelado");
+      }
+    } else {
+      Alert.alert(
+        "Eliminar Empresa",
+        "Tens a certeza que queres eliminar esta empresa? Esta ação não pode ser desfeita.",
+        [
+          {
+            text: "Cancelar",
+            onPress: () => console.log("Cancelado"),
+            style: "cancel",
           },
-          style: "destructive",
-        },
-      ],
-    );
+          {
+            text: "Eliminar",
+            onPress: () => execDelete,
+            style: "destructive",
+          },
+        ],
+      );
+    }
   };
 
   return (

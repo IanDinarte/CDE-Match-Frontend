@@ -61,9 +61,10 @@ export const memberStyle = StyleSheet.create({
     paddingBottom: 40,
   },
   headerRow: {
-    paddingTop: 35,
+    paddingTop: 15,
     paddingBottom: 15,
     paddingLeft: 20,
+    marginBottom: 5,
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: colors.cardBackground,
@@ -109,7 +110,7 @@ export const memberStyle = StyleSheet.create({
     marginBottom: 4,
   },
   descContainer: {
-    marginTop: 10,
+    marginTop: 5,
     marginHorizontal: 15,
     marginBottom: 15,
   },

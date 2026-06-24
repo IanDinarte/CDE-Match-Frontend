@@ -45,9 +45,14 @@ export default function LoginScreen({ navigation }) {
         }
       })
       .catch((error) => {
+        const errorMsg = error.response?.data || "Ocorreu um erro";
+        if (Platform.OS === "web") {
+          window.alert("Error: " + errorMsg);
+        } else {
+          Alert.alert("Error", errorMsg);
+        }
+        console.log(error.message + " " + errorMsg);
         setLoading(false);
-        Alert.alert("Error", error.response.data);
-        console.log(error.message + ": " + error.response.data);
       });
   };
 

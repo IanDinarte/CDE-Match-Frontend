@@ -8,7 +8,7 @@ export const dealStyle = StyleSheet.create({
     paddingBottom: 20,
   },
   searchBarContainer: {
-    marginTop: 20,
+    // marginTop: 20,
     paddingHorizontal: 16,
     paddingVertical: 12,
     flexDirection: "row",
@@ -21,6 +21,10 @@ export const dealStyle = StyleSheet.create({
     color: colors.textMain,
     fontSize: 16,
     flex: 1,
+  },
+  filterButton: {
+    paddingHorizontal: 5,
+    paddingTop: 5
   },
   listContent: {
     padding: 16,
@@ -139,9 +143,10 @@ export const dealStyle = StyleSheet.create({
   detailsHeaderContainer: {
     flexDirection: "row",
     backgroundColor: colors.cardBackground,
-    paddingTop: 30,
+    paddingTop: 10,
     paddingBottom: 10,
     paddingHorizontal: 20,
+    marginBottom: 5,
     gap: 10,
     // alignItems: "center",
     // justifyContent: "center",
@@ -151,6 +156,9 @@ export const dealStyle = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
+  },
+  detailCard: {
+    padding: 5,
   },
   detailTitle: {
     color: colors.textSecondary,

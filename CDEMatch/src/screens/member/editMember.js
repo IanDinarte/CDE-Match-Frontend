@@ -19,7 +19,11 @@ import * as ImagePicker from "expo-image-picker";
 import { colors } from "../../styles/colors";
 import { formStyle } from "../../styles/formStyle";
 import { modalStyle } from "../../styles/modalStyle";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function EditMemberScreen({ route }) {
   const { member } = route.params;
@@ -76,6 +80,24 @@ export default function EditMemberScreen({ route }) {
     checkPendingResult();
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("userToken");
+
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Login" }],
+      });
+    } catch (error) {
+      console.log("Erro ao fazer logout:", error);
+      if (Platform.OS === "web") {
+        window.alert("Error: " + "Não foi possivel terminar a sessão.");
+      } else {
+        Alert.alert("Erro", "Não foi possível terminar a sessão.");
+      }
+    }
+  };
+
   const handleAddWebsite = () => {
     if (!websiteName.trim() || !websiteLink.trim()) {
       Alert.alert("Campos vazios", "Insere o nome e o link do website.");
@@ -128,8 +150,13 @@ export default function EditMemberScreen({ route }) {
         setChangePasswordActive(false);
       })
       .catch((error) => {
-        Alert.alert("Erro", error.response.data);
-        console.log(error.message + ": " + error.response.data);
+        const errorMsg = error.response?.data || "Ocorreu um erro";
+        if (Platform.OS === "web") {
+          window.alert("Error: " + errorMsg);
+        } else {
+          Alert.alert("Error", errorMsg);
+        }
+        console.log(error.message + " " + errorMsg);
       });
   };
 
@@ -231,32 +258,52 @@ export default function EditMemberScreen({ route }) {
         navigation.goBack();
       })
       .catch((error) => {
-        Alert.alert("Erro", error.response.data);
-        console.log(error.message + ": " + error.response.data);
+        const errorMsg = error.response?.data || "Ocorreu um erro";
+        if (Platform.OS === "web") {
+          window.alert("Error: " + errorMsg);
+        } else {
+          Alert.alert("Error", errorMsg);
+        }
+        console.log(error.message + " " + errorMsg);
       });
   };
 
   const deactivateAccount = () => {
-    Alert.alert("Deseja desativar sua conta?", "bla bla bla", [
-      {
-        text: "Cancelar",
-        onPress: () => console.log("Cancelado"),
-        style: "cancel",
-      },
-      {
-        text: "Confirmar",
-        onPress: () => {
-          api
-            .patch(`api/member/${member._id}/deactivate`)
-            .then(() => {})
-            .catch((error) => {
-              Alert.alert("Error", error.response.data);
-              console.log(error.message + " " + error.response.data);
-            });
+    const execDeactivate = () => {
+      api
+        .patch(`api/member/${member._id}/deactivate`)
+        .then(() => {})
+        .catch((error) => {
+          if (Platform.OS === "web") {
+            window.alert("Error: " + errorMsg);
+          } else {
+            Alert.alert("Error", error.response.data);
+          }
+          console.log(error.message + " " + error.response.data);
+        });
+    };
+
+    if (Platform.OS === "web") {
+      const confirmDelete = window.confirm("Deseja desativar sua conta?");
+      if (confirmDelete) {
+        execDeactivate();
+      } else {
+        console.log("Cancelado");
+      }
+    } else {
+      Alert.alert("Deseja desativar sua conta?", "", [
+        {
+          text: "Cancelar",
+          onPress: () => console.log("Cancelado"),
+          style: "cancel",
         },
-        style: "destructive",
-      },
-    ]);
+        {
+          text: "Confirmar",
+          onPress: () => execDeactivate,
+          style: "destructive",
+        },
+      ]);
+    }
   };
 
   return (
@@ -269,245 +316,264 @@ export default function EditMemberScreen({ route }) {
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={formStyle.formHeader}>
-          <View style={formStyle.titleRow}>
-            <TouchableOpacity
-              style={formStyle.backButtonContainer}
-              onPress={() => navigation.goBack()}
-            >
-              <Ionicons
-                style={formStyle.backButton}
-                name="chevron-back-outline"
-                size={30}
-              />
-            </TouchableOpacity>
-
-            <Text style={formStyle.formTitle}>
-              Editar Perfil de {member.name}
-            </Text>
-          </View>
-
-          <TouchableOpacity
-            style={formStyle.avatarContainer}
-            onPress={() => setImageMenuVisible(true)}
-          >
-            {imageUri ? (
-              <Image
-                source={{ uri: imageUri }}
-                style={formStyle.profilePictureInput}
-              />
-            ) : (
-              <View style={formStyle.profilePictureInput}>
-                <Text style={formStyle.avatarText}>
-                  {name ? name.charAt(0).toUpperCase() : "U"}
-                </Text>
-              </View>
-            )}
-            <View style={formStyle.imageButton}>
-              <Ionicons name="camera" size={30} color="#EEEEEE" />
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        <View style={formStyle.formContainer}>
-          <View style={formStyle.inputItem}>
-            <Text style={formStyle.inputLabel}>Nome</Text>
-            <TextInput
-              style={formStyle.textInput}
-              placeholder="Nome"
-              placeholderTextColor={colors.placeholder}
-              value={name}
-              onChangeText={(text) => setName(text)}
-            ></TextInput>
-          </View>
-
-          <View style={formStyle.inputItem}>
-            <Text style={formStyle.inputLabel}>Telemóvel</Text>
-            <TextInput
-              style={formStyle.textInput}
-              placeholder="+351"
-              placeholderTextColor={colors.placeholder}
-              value={phone}
-              onChangeText={(text) => setPhone(text)}
-              inputMode="tel"
-            ></TextInput>
-          </View>
-
-          <View style={formStyle.inputBox}>
-            <Text style={formStyle.inputLabel}>Telemóvel Confidencial</Text>
-            <TouchableOpacity onPress={() => setPhoneConf(!phoneConf)}>
-              {phoneConf ? (
-                <Ionicons name="checkbox" size={30} color={colors.primary} />
-              ) : (
-                <Ionicons
-                  name="square-outline"
-                  size={30}
-                  color={colors.primary}
-                />
-              )}
-            </TouchableOpacity>
-          </View>
-
-          <View style={formStyle.inputItem}>
-            <Text style={formStyle.inputLabel}>Email</Text>
-            <TextInput
-              style={formStyle.textInput}
-              placeholder="exemplo@email.com"
-              placeholderTextColor={colors.placeholder}
-              value={email}
-              onChangeText={(text) => setEmail(text)}
-            ></TextInput>
-          </View>
-
-          <View style={formStyle.inputBox}>
-            <Text style={formStyle.inputLabel}>Email Confidencial</Text>
-            <TouchableOpacity onPress={() => setEmailConf(!emailConf)}>
-              {emailConf ? (
-                <Ionicons name="checkbox" size={30} color={colors.primary} />
-              ) : (
-                <Ionicons
-                  name="square-outline"
-                  size={30}
-                  color={colors.primary}
-                />
-              )}
-            </TouchableOpacity>
-          </View>
-
-          <View style={formStyle.inputItem}>
-            <Text style={formStyle.inputLabel}>Cidade</Text>
-            <TextInput
-              style={formStyle.textInput}
-              placeholder="Cidade"
-              placeholderTextColor={colors.placeholder}
-              value={city}
-              onChangeText={(text) => setCity(text)}
-            ></TextInput>
-          </View>
-
-          <View style={formStyle.inputItem}>
-            <Text style={formStyle.inputLabel}>Descrição</Text>
-            <TextInput
-              style={formStyle.multilineInput}
-              placeholder="Descrição"
-              placeholderTextColor={colors.placeholder}
-              multiline
-              numberOfLines={5}
-              maxLength={300}
-              value={description}
-              onChangeText={(text) => setDescription(text)}
-            ></TextInput>
-          </View>
-
-          <View style={[formStyle.inputItem, { marginTop: 15 }]}>
-            <Text style={formStyle.inputLabel}>
-              Websites ({websites.length}/5)
-            </Text>
-
-            <View
-              style={{
-                backgroundColor: colors.cardBackground,
-                padding: 12,
-                borderRadius: 8,
-                gap: 10,
-              }}
-            >
-              <TextInput
-                style={formStyle.textInput}
-                placeholder="Nome do Website"
-                placeholderTextColor={colors.placeholder}
-                value={websiteName}
-                onChangeText={setWebsiteName}
-              />
-              <TextInput
-                style={formStyle.textInput}
-                placeholder="exemplo.com"
-                placeholderTextColor={colors.placeholder}
-                value={websiteLink}
-                onChangeText={setWebsiteLink}
-                autoCapitalize="none"
-                keyboardType="url"
-              />
+        <SafeAreaView>
+          <View style={formStyle.formHeader}>
+            <View style={formStyle.titleRow}>
               <TouchableOpacity
-                style={[
-                  formStyle.actionButton,
-                  { marginTop: 5, width: "100%", justifyContent: "center" },
-                ]}
-                onPress={handleAddWebsite}
+                style={formStyle.backButtonContainer}
+                onPress={() => navigation.goBack()}
               >
-                <Text style={formStyle.actionButtonText}>
-                  + Adicionar Website
-                </Text>
+                <Ionicons
+                  style={formStyle.backButton}
+                  name="chevron-back-outline"
+                  size={30}
+                />
+              </TouchableOpacity>
+
+              <Text style={formStyle.formTitle}>
+                Editar Perfil de {member.name}
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={formStyle.avatarContainer}
+              onPress={() => setImageMenuVisible(true)}
+            >
+              {imageUri ? (
+                <Image
+                  source={{ uri: imageUri }}
+                  style={formStyle.profilePictureInput}
+                />
+              ) : (
+                <View style={formStyle.profilePictureInput}>
+                  <Text style={formStyle.avatarText}>
+                    {name ? name.charAt(0).toUpperCase() : "U"}
+                  </Text>
+                </View>
+              )}
+              <View style={formStyle.imageButton}>
+                <Ionicons name="camera" size={30} color="#EEEEEE" />
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          <View style={formStyle.formContainer}>
+            <View style={formStyle.inputItem}>
+              <Text style={formStyle.inputLabel}>Nome</Text>
+              <TextInput
+                style={formStyle.textInput}
+                placeholder="Nome"
+                placeholderTextColor={colors.placeholder}
+                value={name}
+                onChangeText={(text) => setName(text)}
+              ></TextInput>
+            </View>
+
+            <View style={formStyle.inputItem}>
+              <Text style={formStyle.inputLabel}>Telemóvel</Text>
+              <TextInput
+                style={formStyle.textInput}
+                placeholder="+351"
+                placeholderTextColor={colors.placeholder}
+                value={phone}
+                onChangeText={(text) => setPhone(text)}
+                inputMode="tel"
+              ></TextInput>
+            </View>
+
+            <View style={formStyle.inputBox}>
+              <Text style={formStyle.inputLabel}>Telemóvel Confidencial</Text>
+              <TouchableOpacity onPress={() => setPhoneConf(!phoneConf)}>
+                {phoneConf ? (
+                  <Ionicons name="checkbox" size={30} color={colors.primary} />
+                ) : (
+                  <Ionicons
+                    name="square-outline"
+                    size={30}
+                    color={colors.primary}
+                  />
+                )}
               </TouchableOpacity>
             </View>
 
-            <View style={{ marginTop: 10, gap: 8 }}>
-              {websites.map((site, index) => (
-                <View
-                  key={index}
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    backgroundColor: colors.background,
-                    padding: 12,
-                    borderRadius: 6,
-                  }}
+            <View style={formStyle.inputItem}>
+              <Text style={formStyle.inputLabel}>Email</Text>
+              <TextInput
+                style={formStyle.textInput}
+                placeholder="exemplo@email.com"
+                placeholderTextColor={colors.placeholder}
+                value={email}
+                onChangeText={(text) => setEmail(text)}
+              ></TextInput>
+            </View>
+
+            <View style={formStyle.inputBox}>
+              <Text style={formStyle.inputLabel}>Email Confidencial</Text>
+              <TouchableOpacity onPress={() => setEmailConf(!emailConf)}>
+                {emailConf ? (
+                  <Ionicons name="checkbox" size={30} color={colors.primary} />
+                ) : (
+                  <Ionicons
+                    name="square-outline"
+                    size={30}
+                    color={colors.primary}
+                  />
+                )}
+              </TouchableOpacity>
+            </View>
+
+            <View style={formStyle.inputItem}>
+              <Text style={formStyle.inputLabel}>Cidade</Text>
+              <TextInput
+                style={formStyle.textInput}
+                placeholder="Cidade"
+                placeholderTextColor={colors.placeholder}
+                value={city}
+                onChangeText={(text) => setCity(text)}
+              ></TextInput>
+            </View>
+
+            <View style={formStyle.inputItem}>
+              <Text style={formStyle.inputLabel}>Descrição</Text>
+              <TextInput
+                style={formStyle.multilineInput}
+                placeholder="Descrição"
+                placeholderTextColor={colors.placeholder}
+                multiline
+                numberOfLines={5}
+                maxLength={300}
+                value={description}
+                onChangeText={(text) => setDescription(text)}
+              ></TextInput>
+            </View>
+
+            <View style={[formStyle.inputItem, { marginTop: 15 }]}>
+              <Text style={formStyle.inputLabel}>
+                Websites ({websites.length}/5)
+              </Text>
+
+              <View
+                style={{
+                  backgroundColor: colors.cardBackground,
+                  padding: 12,
+                  borderRadius: 8,
+                  gap: 10,
+                }}
+              >
+                <TextInput
+                  style={formStyle.textInput}
+                  placeholder="Nome do Website"
+                  placeholderTextColor={colors.placeholder}
+                  value={websiteName}
+                  onChangeText={setWebsiteName}
+                />
+                <TextInput
+                  style={formStyle.textInput}
+                  placeholder="exemplo.com"
+                  placeholderTextColor={colors.placeholder}
+                  value={websiteLink}
+                  onChangeText={setWebsiteLink}
+                  autoCapitalize="none"
+                  keyboardType="url"
+                />
+                <TouchableOpacity
+                  style={[
+                    formStyle.actionButton,
+                    { marginTop: 5, width: "100%", justifyContent: "center" },
+                  ]}
+                  onPress={handleAddWebsite}
                 >
-                  <View style={{ flex: 1, marginRight: 10 }}>
-                    <Text
-                      style={{
-                        color: "#FFF",
-                        fontWeight: "bold",
-                        fontSize: 14,
-                      }}
+                  <Text style={formStyle.actionButtonText}>
+                    + Adicionar Website
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={{ marginTop: 10, gap: 8 }}>
+                {websites.map((site, index) => (
+                  <View
+                    key={index}
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      backgroundColor: colors.background,
+                      padding: 12,
+                      borderRadius: 6,
+                    }}
+                  >
+                    <View style={{ flex: 1, marginRight: 10 }}>
+                      <Text
+                        style={{
+                          color: "#FFF",
+                          fontWeight: "bold",
+                          fontSize: 14,
+                        }}
+                      >
+                        {site.name}
+                      </Text>
+                      <Text
+                        style={{
+                          color: colors.primary || "#A88A44",
+                          fontSize: 12,
+                        }}
+                        numberOfLines={1}
+                      >
+                        {site.link}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => handleRemoveWebsite(index)}
                     >
-                      {site.name}
-                    </Text>
-                    <Text
-                      style={{
-                        color: colors.primary || "#A88A44",
-                        fontSize: 12,
-                      }}
-                      numberOfLines={1}
-                    >
-                      {site.link}
-                    </Text>
+                      <Ionicons
+                        name="trash-outline"
+                        size={22}
+                        color="#FF6B6B"
+                      />
+                    </TouchableOpacity>
                   </View>
-                  <TouchableOpacity onPress={() => handleRemoveWebsite(index)}>
-                    <Ionicons name="trash-outline" size={22} color="#FF6B6B" />
-                  </TouchableOpacity>
-                </View>
-              ))}
+                ))}
+              </View>
+            </View>
+
+            <View style={formStyle.inputItem}>
+              <Text style={formStyle.inputLabel}>Seu Plano: {membership}</Text>
+              {/* <View style={{ alignSelf: "center" }}> */}
+              <TouchableOpacity style={formStyle.actionButton}>
+                <Text style={formStyle.actionButtonText}>Alterar Plano</Text>
+              </TouchableOpacity>
+              {/* </View> */}
+            </View>
+
+            <View style={formStyle.importantArea}>
+              <TouchableOpacity
+                style={formStyle.actionButton}
+                onPress={() => setChangePasswordActive(!changePasswordActive)}
+              >
+                <Text style={formStyle.actionButtonText}>Alterar Senha</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={formStyle.dangerButton}
+                onPress={handleLogout}
+              >
+                <Ionicons name="log-out-outline" size={24} color="#FFF" />
+                <Text style={formStyle.actionButtonText}>Terminar Sessão</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={formStyle.inputItem}>
+              <TouchableOpacity
+                style={formStyle.dangerButton}
+                onPress={() => {
+                  deactivateAccount();
+                }}
+              >
+                <Text style={formStyle.actionButtonText}>Desativar Conta</Text>
+              </TouchableOpacity>
             </View>
           </View>
-
-          <View style={formStyle.inputItem}>
-            <Text style={formStyle.inputLabel}>Seu Plano: {membership}</Text>
-            {/* <View style={{ alignSelf: "center" }}> */}
-            <TouchableOpacity style={formStyle.actionButton}>
-              <Text style={formStyle.actionButtonText}>Alterar Plano</Text>
-            </TouchableOpacity>
-            {/* </View> */}
-          </View>
-
-          <View style={formStyle.importantArea}>
-            <TouchableOpacity
-              style={formStyle.actionButton}
-              onPress={() => setChangePasswordActive(!changePasswordActive)}
-            >
-              <Text style={formStyle.actionButtonText}>Alterar Senha</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={formStyle.dangerButton}
-              onPress={() => {
-                deactivateAccount();
-              }}
-            >
-              <Text style={formStyle.actionButtonText}>Desativar Conta</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        </SafeAreaView>
       </ScrollView>
 
       <View

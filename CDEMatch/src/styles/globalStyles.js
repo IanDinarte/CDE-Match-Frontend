@@ -6,8 +6,8 @@ export const globalStyles = StyleSheet.create({
     backgroundColor: colors.cardBackground,
     borderTopWidth: 0,
     elevation: 0,
-    height: 95,
-    paddingBottom: 10,
+    // height: 95,
+    paddingTop: 3,
   },
   screenContainer: {
     flex: 1,
@@ -26,5 +26,10 @@ export const globalStyles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     color: colors.textPrimary,
+  },
+  refreshButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

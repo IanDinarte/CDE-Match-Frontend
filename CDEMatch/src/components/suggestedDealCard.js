@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   DeviceEventEmitter,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { dealStyle } from "../styles/dealStyle";
@@ -72,34 +73,58 @@ export function SuggestedDealCard({ item, onActionComplete }) {
         }
       })
       .catch((error) => {
-        Alert.alert("Error", error.response.data);
-        console.log(error.message + " " + error.response.data);
+        const errorMsg = error.response?.data || "Ocorreu um erro";
+        if (Platform.OS === "web") {
+          window.alert("Error: " + errorMsg);
+        } else {
+          Alert.alert("Error", errorMsg);
+        }
+        console.log(error.message + " " + errorMsg);
       });
   };
 
   const rejectSuggestion = () => {
-    Alert.alert("Rejeitar Sugestão", "Esta ação não pode ser desfeita.", [
-      {
-        text: "Cancelar",
-        onPress: () => console.log("Cancelado"),
-        style: "cancel",
-      },
-      {
-        text: "Rejeitar",
-        onPress: () => {
-          api
-            .delete(`api/deal/suggestion/${item._id}`)
-            .then(() => {
-              if (onActionComplete) onActionComplete();
-            })
-            .catch((error) => {
-              Alert.alert("Error", error.response.data);
-              console.log(error.message + " " + error.response.data);
-            });
+    const execReject = () => {
+      api
+        .delete(`api/deal/suggestion/${item._id}`)
+        .then(() => {
+          if (onActionComplete) onActionComplete();
+        })
+        .catch((error) => {
+          const errorMsg = error.response?.data || "Ocorreu um erro";
+          if (Platform.OS === "web") {
+            window.alert("Error: " + errorMsg);
+          } else {
+            Alert.alert("Error", errorMsg);
+          }
+          console.log(error.message + " " + errorMsg);
+          s;
+        });
+    };
+
+    if (Platform.OS === "web") {
+      const confirmDelete = window.confirm(
+        "Rejeitar Sugestão, Esta ação não pode ser desfeita.",
+      );
+      if (confirmDelete) {
+        execReject();
+      } else {
+        console.log("Cancelado");
+      }
+    } else {
+      Alert.alert("Rejeitar Sugestão", "Esta ação não pode ser desfeita.", [
+        {
+          text: "Cancelar",
+          onPress: () => console.log("Cancelado"),
+          style: "cancel",
         },
-        style: "destructive",
-      },
-    ]);
+        {
+          text: "Rejeitar",
+          onPress: () => execReject,
+          style: "destructive",
+        },
+      ]);
+    }
   };
 
   const onMatchButtonPress = () => {
@@ -121,11 +146,13 @@ export function SuggestedDealCard({ item, onActionComplete }) {
           dealId: item.deal._id,
           isMatched: previousState,
         });
-        Alert.alert(
-          "Error",
-          error.response?.data || "Erro de ligação ao servidor.",
-        );
-        console.log(error.message + " " + error.response.data);
+        const errorMsg = error.response?.data || "Ocorreu um erro";
+        if (Platform.OS === "web") {
+          window.alert("Error: " + errorMsg);
+        } else {
+          Alert.alert("Error", errorMsg);
+        }
+        console.log(error.message + " " + errorMsg);
       });
   };
 

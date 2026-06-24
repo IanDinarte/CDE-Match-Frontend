@@ -10,6 +10,7 @@ import {
   RefreshControl,
   Alert,
   DeviceEventEmitter,
+  Platform,
 } from "react-native";
 import api from "../../services/api";
 import { Ionicons } from "@expo/vector-icons";
@@ -22,7 +23,10 @@ import { jwtDecode } from "jwt-decode";
 import { colors } from "../../styles/colors";
 import { formStyle } from "../../styles/formStyle";
 import { modalStyle } from "../../styles/modalStyle";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 export default function DealDetailsScreen({ route }) {
   const { id } = route.params;
@@ -62,8 +66,13 @@ export default function DealDetailsScreen({ route }) {
         setLoading(false);
       })
       .catch((error) => {
-        Alert.alert("Error", error.response.data);
-        console.log(error.message + " " + error.response.data);
+        const errorMsg = error.response?.data || "Ocorreu um erro";
+        if (Platform.OS === "web") {
+          window.alert("Error: " + errorMsg);
+        } else {
+          Alert.alert("Error", errorMsg);
+        }
+        console.log(error.message + " " + errorMsg);
         setLoading(false);
       });
   };
@@ -82,8 +91,13 @@ export default function DealDetailsScreen({ route }) {
         }
       })
       .catch((error) => {
-        Alert.alert("Error", error.response.data);
-        console.log(error.message + " " + error.response.data);
+        const errorMsg = error.response?.data || "Ocorreu um erro";
+        if (Platform.OS === "web") {
+          window.alert("Error: " + errorMsg);
+        } else {
+          Alert.alert("Error", errorMsg);
+        }
+        console.log(error.message + " " + errorMsg);
       });
   };
 
@@ -99,7 +113,13 @@ export default function DealDetailsScreen({ route }) {
         setRefreshing(false);
       })
       .catch((error) => {
-        console.log(error.message);
+        const errorMsg = error.response?.data || "Ocorreu um erro";
+        if (Platform.OS === "web") {
+          window.alert("Error: " + errorMsg);
+        } else {
+          Alert.alert("Error", errorMsg);
+        }
+        console.log(error.message + " " + errorMsg);
         setLoading(false);
         setRefreshing(false);
       });
@@ -121,11 +141,13 @@ export default function DealDetailsScreen({ route }) {
         dealId: deal._id,
         isMatched: previousState,
       });
-      Alert.alert(
-        "Error",
-        error.response?.data || "Erro de ligação ao servidor.",
-      );
-      console.log(error.message + " " + error.response.data);
+      const errorMsg = error.response?.data || "Ocorreu um erro";
+      if (Platform.OS === "web") {
+        window.alert("Error: " + errorMsg);
+      } else {
+        Alert.alert("Error", errorMsg);
+      }
+      console.log(error.message + " " + errorMsg);
     });
   };
 
@@ -182,7 +204,7 @@ export default function DealDetailsScreen({ route }) {
   const initialLetter = ownerName.charAt(0).toUpperCase();
 
   return (
-    <View style={dealStyle.detailsContainer}>
+    <SafeAreaView style={dealStyle.detailsContainer}>
       <View style={dealStyle.detailsHeaderContainer}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons
@@ -194,8 +216,26 @@ export default function DealDetailsScreen({ route }) {
         <Text style={dealStyle.detailTitle}>{deal.title}</Text>
       </View>
 
+      {Platform.OS === "web" && (
+        <TouchableOpacity
+          style={globalStyles.refreshButton}
+          onPress={onRefresh}
+        >
+          <Ionicons name="reload" size={20} color={colors.primary} />
+          <Text
+            style={{
+              color: colors.primary,
+              marginLeft: 10,
+              fontWeight: "bold",
+            }}
+          >
+            Atualizar Negócio
+          </Text>
+        </TouchableOpacity>
+      )}
+
       <ScrollView
-        contentContainerStyle={dealStyle.listContent}
+        style={dealStyle.detailCard}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -374,6 +414,6 @@ export default function DealDetailsScreen({ route }) {
           )}
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }

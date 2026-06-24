@@ -8,11 +8,14 @@ import {
   Alert,
   TextInput,
   RefreshControl,
+  Platform,
+  TouchableOpacity,
 } from "react-native";
 import api from "../../services/api";
 import { globalStyles } from "../../styles/globalStyles";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../../styles/colors";
+import { Ionicons } from "@expo/vector-icons";
 import { dealStyle } from "../../styles/dealStyle";
 import { MemberCard } from "../../components/memberCard";
 
@@ -37,8 +40,13 @@ export default function MemberListScreen() {
         setRefreshing(false);
       })
       .catch((error) => {
-        Alert.alert("Error", error.response.data);
-        console.log(error.message + " " + error.response.data);
+        const errorMsg = error.response?.data || "Ocorreu um erro";
+        if (Platform.OS === "web") {
+          window.alert("Error: " + errorMsg);
+        } else {
+          Alert.alert("Error", errorMsg);
+        }
+        console.log(error.message + " " + errorMsg);
         setLoading(false);
         setRefreshing(false);
       });
@@ -54,8 +62,8 @@ export default function MemberListScreen() {
   }, [searchText]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaView style={[dealStyle.container, { flex: 1 }]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={[dealStyle.container, { flex: 1 }]}>
         <View style={dealStyle.searchBarContainer}>
           <TextInput
             style={dealStyle.searchBar}
@@ -66,6 +74,24 @@ export default function MemberListScreen() {
             clearButtonMode="while-editing"
           />
         </View>
+
+        {Platform.OS === "web" && (
+          <TouchableOpacity
+            style={globalStyles.refreshButton}
+            onPress={onRefresh}
+          >
+            <Ionicons name="reload" size={20} color={colors.primary} />
+            <Text
+              style={{
+                color: colors.primary,
+                marginLeft: 10,
+                fontWeight: "bold",
+              }}
+            >
+              Atualizar Lista
+            </Text>
+          </TouchableOpacity>
+        )}
 
         {loading && members.length === 0 ? (
           <View
@@ -97,7 +123,7 @@ export default function MemberListScreen() {
             }
           />
         )}
-      </SafeAreaView>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }

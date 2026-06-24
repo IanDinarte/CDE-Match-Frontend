@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
-  SafeAreaView,
   View,
   Text,
   FlatList,
@@ -8,6 +7,7 @@ import {
   RefreshControl,
   TouchableOpacity,
   Alert,
+  Platform,
 } from "react-native";
 import { dealStyle } from "../../styles/dealStyle";
 import { colors } from "../../styles/colors";
@@ -15,7 +15,9 @@ import api from "../../services/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { SuggestedDealCard } from "../../components/suggestedDealCard";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { formStyle } from "../../styles/formStyle";
+import { globalStyles } from "../../styles/globalStyles";
 
 export default function SuggestedDealsScreen() {
   const [deals, setDeals] = useState([]);
@@ -33,8 +35,13 @@ export default function SuggestedDealsScreen() {
         setRefreshing(false);
       })
       .catch((error) => {
-        Alert.alert("Error", error.response.data);
-        console.log(error.message + " " + error.response.data);
+        const errorMsg = error.response?.data || "Ocorreu um erro";
+        if (Platform.OS === "web") {
+          window.alert("Error: " + errorMsg);
+        } else {
+          Alert.alert("Error", errorMsg);
+        }
+        console.log(error.message + " " + errorMsg);
         setLoading(false);
         setRefreshing(false);
       });
@@ -50,7 +57,7 @@ export default function SuggestedDealsScreen() {
   }, []);
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={dealStyle.detailsHeaderContainer}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons
@@ -61,6 +68,24 @@ export default function SuggestedDealsScreen() {
         </TouchableOpacity>
         <Text style={dealStyle.detailTitle}>Negócios Sugeridos</Text>
       </View>
+
+      {Platform.OS === "web" && (
+        <TouchableOpacity
+          style={globalStyles.refreshButton}
+          onPress={onRefresh}
+        >
+          <Ionicons name="reload" size={20} color={colors.primary} />
+          <Text
+            style={{
+              color: colors.primary,
+              marginLeft: 10,
+              fontWeight: "bold",
+            }}
+          >
+            Atualizar Lista
+          </Text>
+        </TouchableOpacity>
+      )}
 
       {loading && deals.length === 0 ? (
         <View
@@ -97,6 +122,6 @@ export default function SuggestedDealsScreen() {
           }
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 }

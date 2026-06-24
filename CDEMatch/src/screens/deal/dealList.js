@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   Alert,
+  Platform,
 } from "react-native";
 import Modal from "react-native-modal";
 import api from "../../services/api";
@@ -35,7 +36,7 @@ export default function DealListScreen() {
   const [selectedArea, setSelectedArea] = useState("Todas");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [matchFilter, setMatchFilter] = useState("Todos"); //"Todos", "Matched", "Unmatched"
+  const [matchFilter, setMatchFilter] = useState(0); //0 "Todos", 1 "Interessados", 2 "Por Ver"
 
   const insets = useSafeAreaInsets();
 
@@ -59,8 +60,13 @@ export default function DealListScreen() {
         setRefreshing(false);
       })
       .catch((error) => {
-        Alert.alert("Error", error.response.data);
-        console.log(error.message + " " + error.response.data);
+        const errorMsg = error.response?.data || "Ocorreu um erro";
+        if (Platform.OS === "web") {
+          window.alert("Error: " + errorMsg);
+        } else {
+          Alert.alert("Error", errorMsg);
+        }
+        console.log(error.message + " " + errorMsg);
         setLoading(false);
         setRefreshing(false);
       });
@@ -68,7 +74,7 @@ export default function DealListScreen() {
 
   useEffect(() => {
     fetchDeals();
-  }, [searchText, selectedType, selectedArea, minPrice, maxPrice, matchFilter]);
+  }, [selectedType, selectedArea, minPrice, maxPrice, matchFilter]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -76,8 +82,8 @@ export default function DealListScreen() {
   }, [searchText, selectedType, selectedArea, minPrice, maxPrice, matchFilter]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaView style={[dealStyle.container, { flex: 1 }]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={[dealStyle.container, { flex: 1 }]}>
         <View style={dealStyle.searchBarContainer}>
           <TextInput
             style={dealStyle.searchBar}
@@ -86,7 +92,10 @@ export default function DealListScreen() {
             value={searchText}
             onChangeText={(text) => setSearchText(text)}
             clearButtonMode="while-editing"
+            returnKeyType="search"
+            onSubmitEditing={fetchDeals}
           />
+
           <TouchableOpacity
             style={dealStyle.filterButton}
             onPress={() => setFiltersActive(!filtersActive)}
@@ -94,6 +103,24 @@ export default function DealListScreen() {
             <Ionicons name={"funnel-outline"} size={30} color={"#EEE"} />
           </TouchableOpacity>
         </View>
+
+        {Platform.OS === "web" && (
+          <TouchableOpacity
+            style={globalStyles.refreshButton}
+            onPress={onRefresh}
+          >
+            <Ionicons name="reload" size={20} color={colors.primary} />
+            <Text
+              style={{
+                color: colors.primary,
+                marginLeft: 10,
+                fontWeight: "bold",
+              }}
+            >
+              Atualizar Lista
+            </Text>
+          </TouchableOpacity>
+        )}
 
         {loading && deals.length === 0 ? (
           <View
@@ -274,7 +301,7 @@ export default function DealListScreen() {
             </TouchableOpacity>
           </View>
         </Modal>
-      </SafeAreaView>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }

@@ -16,6 +16,7 @@ import DealDetailsScreen from "../screens/deal/dealDetails";
 import SuggestedDealsScreen from "../screens/deal/suggestedDeals";
 import CreateDealScreen from "../screens/deal/createDeal";
 import EditDealScreen from "../screens/deal/editDeal";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const ProfileStack = createStackNavigator();
 const DealStack = createStackNavigator();
@@ -24,9 +25,9 @@ const MemberStack = createStackNavigator();
 // const MatchesStack = createStackNavigator();
 
 const PlaceHolderScreen = () => (
-  <View style={{ flex: 1, backgroundColor: colors.background }}>
+  <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
     <Text style={{ color: "white", padding: 50 }}>Em construção...</Text>
-  </View>
+  </SafeAreaView>
 );
 
 const Tab = createBottomTabNavigator();

@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Platform,
 } from "react-native";
 import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,7 +16,10 @@ import { colors } from "../../styles/colors";
 import { dealStyle } from "../../styles/dealStyle";
 import { modalStyle } from "../../styles/modalStyle";
 import { formStyle } from "../../styles/formStyle";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 export default function EditDealScreen({ route }) {
   const [title, setTitle] = useState(route.params.deal.title);
@@ -36,29 +40,41 @@ export default function EditDealScreen({ route }) {
   const insets = useSafeAreaInsets();
 
   const deleteDeal = () => {
-    Alert.alert("Deletar Deal", "Esta ação não pode ser desfeita.", [
-      {
-        text: "Cancelar",
-        onPress: () => console.log("Cancelado"),
-        style: "cancel",
-      },
-      {
-        text: "Deletar",
-        onPress: () => {
-          api
-            .delete(`api/deal/${route.params.deal._id}`)
-            .then((res) => {
-              Alert.alert("Sucesso", res.data);
-              navigation.goBack();
-            })
-            .catch((error) => {
-              Alert.alert("Error", error.response.data);
-              console.log(error.message + " " + error.response.data);
-            });
+    const execDelete = () => {
+      api
+        .delete(`api/deal/${route.params.deal._id}`)
+        .then((res) => {
+          Alert.alert("Sucesso", res.data);
+          navigation.goBack();
+        })
+        .catch((error) => {
+          Alert.alert("Error", error.response.data);
+          console.log(error.message + " " + error.response.data);
+        });
+    };
+    if (Platform.OS === "web") {
+      const confirmDelete = window.confirm(
+        "Deletar Deal, Esta ação não pode ser desfeita.",
+      );
+      if (confirmDelete) {
+        execDelete();
+      } else {
+        console.log("Cancelado");
+      }
+    } else {
+      Alert.alert("Deletar Deal", "Esta ação não pode ser desfeita.", [
+        {
+          text: "Cancelar",
+          onPress: () => console.log("Cancelado"),
+          style: "cancel",
         },
-        style: "destructive",
-      },
-    ]);
+        {
+          text: "Deletar",
+          onPress: () => execDelete,
+          style: "destructive",
+        },
+      ]);
+    }
   };
 
   const editDeal = () => {
@@ -79,276 +95,289 @@ export default function EditDealScreen({ route }) {
         Alert.alert("Sucesso", res.data || "Negócio Editado com Sucesso");
       })
       .catch((error) => {
-        Alert.alert("Error", error.response.data);
-        console.log(error.message + " " + error.response.data);
+        const errorMsg = error.response?.data || "Ocorreu um erro";
+        if (Platform.OS === "web") {
+          window.alert("Error: " + errorMsg);
+        } else {
+          Alert.alert("Error", errorMsg);
+        }
+        console.log(error.message + " " + errorMsg);
       });
   };
 
   return (
     <View style={{ flex: 1 }}>
       <ScrollView style={dealStyle.detailsContainer}>
-        <View style={dealStyle.detailsHeaderContainer}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons
-              style={formStyle.backButton}
-              name="chevron-back-outline"
-              size={30}
-            />
-          </TouchableOpacity>
-          <Text style={dealStyle.detailTitle}>Editar Negócio</Text>
-        </View>
-
-        <View style={{ padding: 16 }}>
-          <View style={dealStyle.card}>
-            <View style={dealStyle.inputItem}>
-              <Text style={dealStyle.inputLabel}>Titulo do Negócio*</Text>
-              <TextInput
-                style={dealStyle.textInput}
-                placeholder="Titulo..."
-                placeholderTextColor={colors.placeholder}
-                value={title}
-                onChangeText={(text) => setTitle(text)}
+        <SafeAreaView>
+          <View style={dealStyle.detailsHeaderContainer}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons
+                style={formStyle.backButton}
+                name="chevron-back-outline"
+                size={30}
               />
-            </View>
+            </TouchableOpacity>
+            <Text style={dealStyle.detailTitle}>Editar Negócio</Text>
+          </View>
 
-            <View style={dealStyle.inputItem}>
-              <Text style={dealStyle.inputLabel}>Descrição do Negócio*</Text>
-              <TextInput
-                style={dealStyle.multilineInput}
-                placeholder="Descrição..."
-                placeholderTextColor={colors.placeholder}
-                multiline
-                numberOfLines={5}
-                maxLength={300}
-                value={description}
-                onChangeText={(text) => setDescription(text)}
-              />
-            </View>
-
-            <View style={dealStyle.inputItem}>
-              <Text style={dealStyle.inputLabel}>Preço*</Text>
-              <TextInput
-                style={dealStyle.textInput}
-                placeholder="€"
-                placeholderTextColor={colors.placeholder}
-                value={price}
-                onChangeText={(value) => setPrice(value)}
-                inputMode="numeric"
-              />
-            </View>
-
-            <View style={dealStyle.inputItem}>
-              <Text style={dealStyle.inputLabel}>Tipo de Negócio*</Text>
-              <TouchableOpacity
-                style={dealStyle.actionButton}
-                onPress={() => setSelectTypeActive(!selectTypeActive)}
-              >
-                <Text style={dealStyle.actionButtonText}>{type}</Text>
-              </TouchableOpacity>
-            </View>
-
-            <Modal
-              isVisible={selectTypeActive}
-              onBackdropPress={() => setSelectTypeActive(false)}
-              onBackButtonPress={() => setSelectTypeActive(false)}
-              backdropOpacity={0.6}
-              backdropTransitionOutTiming={10}
-              style={{ margin: 0, justifyContent: "flex-end" }}
-              animationIn="slideInUp"
-              animationOut="slideOutDown"
-              useNativeDriver={true}
-            >
-              <View
-                style={[
-                  modalStyle.filterModalCard,
-                  { paddingBottom: Math.max(insets.bottom, 20) },
-                ]}
-              >
-                <Text style={modalStyle.filterLabel}>
-                  Selecione o Tipo de Negócio
-                </Text>
-                <View style={modalStyle.chipContainer}>
-                  {["Oferta", "Procura"].map((dealType) => {
-                    const isSelected = type === dealType;
-                    return (
-                      <TouchableOpacity
-                        key={dealType}
-                        style={[
-                          modalStyle.chip,
-                          isSelected && modalStyle.chipSelected,
-                        ]}
-                        onPress={() => setType(dealType)}
-                      >
-                        <Text
-                          style={[
-                            modalStyle.chipText,
-                            isSelected && modalStyle.chipTextSelected,
-                          ]}
-                        >
-                          {dealType}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
+          <View style={{ padding: 16 }}>
+            <View style={dealStyle.card}>
+              <View style={dealStyle.inputItem}>
+                <Text style={dealStyle.inputLabel}>Titulo do Negócio*</Text>
+                <TextInput
+                  style={dealStyle.textInput}
+                  placeholder="Titulo..."
+                  placeholderTextColor={colors.placeholder}
+                  value={title}
+                  onChangeText={(text) => setTitle(text)}
+                />
               </View>
-            </Modal>
 
-            <View style={dealStyle.inputItem}>
-              <Text style={dealStyle.inputLabel}>Area do Negócio*</Text>
-              <TouchableOpacity
-                style={dealStyle.actionButton}
-                onPress={() => setSelectAreaActive(!selectAreaActive)}
-              >
-                <Text style={dealStyle.actionButtonText}>{area}</Text>
-              </TouchableOpacity>
-            </View>
-
-            <Modal
-              isVisible={selectAreaActive}
-              onBackdropPress={() => setSelectAreaActive(false)}
-              onBackButtonPress={() => setSelectAreaActive(false)}
-              backdropOpacity={0.6}
-              backdropTransitionOutTiming={10}
-              style={{ margin: 0, justifyContent: "flex-end" }}
-              animationIn="slideInUp"
-              animationOut="slideOutDown"
-              useNativeDriver={true}
-            >
-              <View
-                style={[
-                  modalStyle.filterModalCard,
-                  { paddingBottom: Math.max(insets.bottom, 20) },
-                ]}
-              >
-                <Text style={modalStyle.filterLabel}>
-                  Selecione a Area do Negócio
-                </Text>
-                <View style={modalStyle.chipContainer}>
-                  {[
-                    "Investimento",
-                    "Venda de Ativo",
-                    "Parceria Estratégica",
-                    "Compra de Negócio",
-                    "Financiamento",
-                    "Ajuda Rápida",
-                    "Procura de Perfis Chave",
-                    "Oportunidades",
-                    "Imobiliário",
-                  ].map((dealArea) => {
-                    const isSelected = area === dealArea;
-                    return (
-                      <TouchableOpacity
-                        key={dealArea}
-                        style={[
-                          modalStyle.chip,
-                          isSelected && modalStyle.chipSelected,
-                        ]}
-                        onPress={() => setArea(dealArea)}
-                      >
-                        <Text
-                          style={[
-                            modalStyle.chipText,
-                            isSelected && modalStyle.chipTextSelected,
-                          ]}
-                        >
-                          {dealArea}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
+              <View style={dealStyle.inputItem}>
+                <Text style={dealStyle.inputLabel}>Descrição do Negócio*</Text>
+                <TextInput
+                  style={dealStyle.multilineInput}
+                  placeholder="Descrição..."
+                  placeholderTextColor={colors.placeholder}
+                  multiline
+                  numberOfLines={5}
+                  maxLength={300}
+                  value={description}
+                  onChangeText={(text) => setDescription(text)}
+                />
               </View>
-            </Modal>
 
-            <View style={dealStyle.inputItem}>
-              <Text style={dealStyle.inputLabel}>
-                Alterar Estado do Negócio*
-              </Text>
-              <TouchableOpacity
-                style={dealStyle.actionButton}
-                onPress={() => setSelectStateActive(!selectStateActive)}
-              >
-                <Text style={dealStyle.actionButtonText}>{state}</Text>
-              </TouchableOpacity>
-            </View>
-
-            <Modal
-              isVisible={selectStateActive}
-              onBackdropPress={() => setSelectStateActive(false)}
-              onBackButtonPress={() => setSelectStateActive(false)}
-              backdropOpacity={0.6}
-              backdropTransitionOutTiming={10}
-              style={{ margin: 0, justifyContent: "flex-end" }}
-              animationIn="slideInUp"
-              animationOut="slideOutDown"
-              useNativeDriver={true}
-            >
-              <View
-                style={[
-                  modalStyle.filterModalCard,
-                  { paddingBottom: Math.max(insets.bottom, 20) },
-                ]}
-              >
-                <Text style={modalStyle.filterLabel}>
-                  Selecione o Estado do Negócio
-                </Text>
-                <View style={modalStyle.chipContainer}>
-                  {["Disponivel", "Fechado", "Cancelado"].map((dealState) => {
-                    const isSelected = state === dealState;
-                    return (
-                      <TouchableOpacity
-                        key={dealState}
-                        style={[
-                          modalStyle.chip,
-                          isSelected && modalStyle.chipSelected,
-                        ]}
-                        onPress={() => setState(dealState)}
-                      >
-                        <Text
-                          style={[
-                            modalStyle.chipText,
-                            isSelected && modalStyle.chipTextSelected,
-                          ]}
-                        >
-                          {dealState}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
+              <View style={dealStyle.inputItem}>
+                <Text style={dealStyle.inputLabel}>Preço*</Text>
+                <TextInput
+                  style={dealStyle.textInput}
+                  placeholder="€"
+                  placeholderTextColor={colors.placeholder}
+                  value={price}
+                  onChangeText={(value) => setPrice(value)}
+                  inputMode="numeric"
+                />
               </View>
-            </Modal>
 
-            <View style={dealStyle.inputBox}>
-              <Text style={dealStyle.inputLabel}>Negócio Confidencial</Text>
-              <TouchableOpacity onPress={() => setConfidential(!confidential)}>
-                {confidential ? (
-                  <Ionicons name="checkbox" size={30} color={colors.primary} />
-                ) : (
-                  <Ionicons
-                    name="square-outline"
-                    size={30}
-                    color={colors.primary}
-                  />
-                )}
-              </TouchableOpacity>
-            </View>
-
-            {state === "Cancelado" && (
-              <View style={[dealStyle.inputBox, { marginTop: 10 }]}>
+              <View style={dealStyle.inputItem}>
+                <Text style={dealStyle.inputLabel}>Tipo de Negócio*</Text>
                 <TouchableOpacity
-                  style={dealStyle.dangerButton}
-                  onPress={() => deleteDeal()}
+                  style={dealStyle.actionButton}
+                  onPress={() => setSelectTypeActive(!selectTypeActive)}
                 >
-                  <Text style={dealStyle.actionButtonText}>
-                    Deletar Negócio
-                  </Text>
+                  <Text style={dealStyle.actionButtonText}>{type}</Text>
                 </TouchableOpacity>
               </View>
-            )}
+
+              <Modal
+                isVisible={selectTypeActive}
+                onBackdropPress={() => setSelectTypeActive(false)}
+                onBackButtonPress={() => setSelectTypeActive(false)}
+                backdropOpacity={0.6}
+                backdropTransitionOutTiming={10}
+                style={{ margin: 0, justifyContent: "flex-end" }}
+                animationIn="slideInUp"
+                animationOut="slideOutDown"
+                useNativeDriver={true}
+              >
+                <View
+                  style={[
+                    modalStyle.filterModalCard,
+                    { paddingBottom: Math.max(insets.bottom, 20) },
+                  ]}
+                >
+                  <Text style={modalStyle.filterLabel}>
+                    Selecione o Tipo de Negócio
+                  </Text>
+                  <View style={modalStyle.chipContainer}>
+                    {["Oferta", "Procura"].map((dealType) => {
+                      const isSelected = type === dealType;
+                      return (
+                        <TouchableOpacity
+                          key={dealType}
+                          style={[
+                            modalStyle.chip,
+                            isSelected && modalStyle.chipSelected,
+                          ]}
+                          onPress={() => setType(dealType)}
+                        >
+                          <Text
+                            style={[
+                              modalStyle.chipText,
+                              isSelected && modalStyle.chipTextSelected,
+                            ]}
+                          >
+                            {dealType}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                </View>
+              </Modal>
+
+              <View style={dealStyle.inputItem}>
+                <Text style={dealStyle.inputLabel}>Area do Negócio*</Text>
+                <TouchableOpacity
+                  style={dealStyle.actionButton}
+                  onPress={() => setSelectAreaActive(!selectAreaActive)}
+                >
+                  <Text style={dealStyle.actionButtonText}>{area}</Text>
+                </TouchableOpacity>
+              </View>
+
+              <Modal
+                isVisible={selectAreaActive}
+                onBackdropPress={() => setSelectAreaActive(false)}
+                onBackButtonPress={() => setSelectAreaActive(false)}
+                backdropOpacity={0.6}
+                backdropTransitionOutTiming={10}
+                style={{ margin: 0, justifyContent: "flex-end" }}
+                animationIn="slideInUp"
+                animationOut="slideOutDown"
+                useNativeDriver={true}
+              >
+                <View
+                  style={[
+                    modalStyle.filterModalCard,
+                    { paddingBottom: Math.max(insets.bottom, 20) },
+                  ]}
+                >
+                  <Text style={modalStyle.filterLabel}>
+                    Selecione a Area do Negócio
+                  </Text>
+                  <View style={modalStyle.chipContainer}>
+                    {[
+                      "Investimento",
+                      "Venda de Ativo",
+                      "Parceria Estratégica",
+                      "Compra de Negócio",
+                      "Financiamento",
+                      "Ajuda Rápida",
+                      "Procura de Perfis Chave",
+                      "Oportunidades",
+                      "Imobiliário",
+                    ].map((dealArea) => {
+                      const isSelected = area === dealArea;
+                      return (
+                        <TouchableOpacity
+                          key={dealArea}
+                          style={[
+                            modalStyle.chip,
+                            isSelected && modalStyle.chipSelected,
+                          ]}
+                          onPress={() => setArea(dealArea)}
+                        >
+                          <Text
+                            style={[
+                              modalStyle.chipText,
+                              isSelected && modalStyle.chipTextSelected,
+                            ]}
+                          >
+                            {dealArea}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                </View>
+              </Modal>
+
+              <View style={dealStyle.inputItem}>
+                <Text style={dealStyle.inputLabel}>
+                  Alterar Estado do Negócio*
+                </Text>
+                <TouchableOpacity
+                  style={dealStyle.actionButton}
+                  onPress={() => setSelectStateActive(!selectStateActive)}
+                >
+                  <Text style={dealStyle.actionButtonText}>{state}</Text>
+                </TouchableOpacity>
+              </View>
+
+              <Modal
+                isVisible={selectStateActive}
+                onBackdropPress={() => setSelectStateActive(false)}
+                onBackButtonPress={() => setSelectStateActive(false)}
+                backdropOpacity={0.6}
+                backdropTransitionOutTiming={10}
+                style={{ margin: 0, justifyContent: "flex-end" }}
+                animationIn="slideInUp"
+                animationOut="slideOutDown"
+                useNativeDriver={true}
+              >
+                <View
+                  style={[
+                    modalStyle.filterModalCard,
+                    { paddingBottom: Math.max(insets.bottom, 20) },
+                  ]}
+                >
+                  <Text style={modalStyle.filterLabel}>
+                    Selecione o Estado do Negócio
+                  </Text>
+                  <View style={modalStyle.chipContainer}>
+                    {["Disponivel", "Fechado", "Cancelado"].map((dealState) => {
+                      const isSelected = state === dealState;
+                      return (
+                        <TouchableOpacity
+                          key={dealState}
+                          style={[
+                            modalStyle.chip,
+                            isSelected && modalStyle.chipSelected,
+                          ]}
+                          onPress={() => setState(dealState)}
+                        >
+                          <Text
+                            style={[
+                              modalStyle.chipText,
+                              isSelected && modalStyle.chipTextSelected,
+                            ]}
+                          >
+                            {dealState}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                </View>
+              </Modal>
+
+              <View style={dealStyle.inputBox}>
+                <Text style={dealStyle.inputLabel}>Negócio Confidencial</Text>
+                <TouchableOpacity
+                  onPress={() => setConfidential(!confidential)}
+                >
+                  {confidential ? (
+                    <Ionicons
+                      name="checkbox"
+                      size={30}
+                      color={colors.primary}
+                    />
+                  ) : (
+                    <Ionicons
+                      name="square-outline"
+                      size={30}
+                      color={colors.primary}
+                    />
+                  )}
+                </TouchableOpacity>
+              </View>
+
+              {state === "Cancelado" && (
+                <View style={[dealStyle.inputBox, { marginTop: 10 }]}>
+                  <TouchableOpacity
+                    style={dealStyle.dangerButton}
+                    onPress={() => deleteDeal()}
+                  >
+                    <Text style={dealStyle.actionButtonText}>
+                      Deletar Negócio
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
           </View>
-        </View>
+        </SafeAreaView>
       </ScrollView>
       <View
         style={{

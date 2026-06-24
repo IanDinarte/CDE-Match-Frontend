@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   DeviceEventEmitter,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { dealStyle } from "../styles/dealStyle";
@@ -50,8 +51,13 @@ export function DealCard({ deal }) {
         setLoading(false);
       })
       .catch((error) => {
-        Alert.alert("Error", error.response.data);
-        console.log(error.message + " " + error.response.data);
+        const errorMsg = error.response?.data || "Ocorreu um erro";
+        if (Platform.OS === "web") {
+          window.alert("Error: " + errorMsg);
+        } else {
+          Alert.alert("Error", errorMsg);
+        }
+        console.log(error.message + " " + errorMsg);
         setLoading(false);
       });
   };
@@ -70,8 +76,13 @@ export function DealCard({ deal }) {
         }
       })
       .catch((error) => {
-        Alert.alert("Error", error.response.data);
-        console.log(error.message + " " + error.response.data);
+        const errorMsg = error.response?.data || "Ocorreu um erro";
+        if (Platform.OS === "web") {
+          window.alert("Error: " + errorMsg);
+        } else {
+          Alert.alert("Error", errorMsg);
+        }
+        console.log(error.message + " " + errorMsg);
       });
   };
 
@@ -94,11 +105,13 @@ export function DealCard({ deal }) {
           dealId: deal._id,
           isMatched: previousState,
         });
-        Alert.alert(
-          "Error",
-          error.response?.data || "Erro de ligação ao servidor.",
-        );
-        console.log(error.message + " " + error.response.data);
+        const errorMsg = error.response?.data || "Ocorreu um erro";
+        if (Platform.OS === "web") {
+          window.alert("Error: " + errorMsg);
+        } else {
+          Alert.alert("Error", errorMsg);
+        }
+        console.log(error.message + " " + errorMsg);
       });
   };
 
