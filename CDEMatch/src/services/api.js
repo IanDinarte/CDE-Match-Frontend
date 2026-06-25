@@ -7,7 +7,7 @@ const port = 3000;
 
 const api = axios.create({
   // baseURL: `http://192.168.1.72:${port}`,
-  baseURL: "https://cdematch.alwaysdata.net/",
+  baseURL: "https://clubedoempreendedor.alwaysdata.net/",
   timeout: 10000,
 });
 

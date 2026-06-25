@@ -576,15 +576,6 @@ export default function EditMemberScreen({ route }) {
               </View>
             </View>
 
-            <View style={formStyle.inputItem}>
-              <Text style={formStyle.inputLabel}>Seu Plano: {membership}</Text>
-              {/* <View style={{ alignSelf: "center" }}> */}
-              <TouchableOpacity style={formStyle.actionButton}>
-                <Text style={formStyle.actionButtonText}>Alterar Plano</Text>
-              </TouchableOpacity>
-              {/* </View> */}
-            </View>
-
             <View style={formStyle.importantArea}>
               <TouchableOpacity
                 style={formStyle.actionButton}
