@@ -6,7 +6,7 @@ import { Platform } from "react-native";
 const port = 3000;
 
 const api = axios.create({
-  // baseURL: `http://192.168.1.72:${port}`,
+  // baseURL: `http://192.168.1.64:${port}`,
   baseURL: "https://clubedoempreendedor.alwaysdata.net/",
   timeout: 10000,
 });

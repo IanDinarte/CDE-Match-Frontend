@@ -31,6 +31,11 @@ export const loginStyle = StyleSheet.create({
     fontWeight: "bold",
     letterSpacing: 1,
   },
+  fpLabel: {
+    color: colors.textSecondary,
+    fontSize: 16,
+    fontWeight: "medium",
+  },
   formCard: {
     backgroundColor: colors.background,
     borderRadius: 15,

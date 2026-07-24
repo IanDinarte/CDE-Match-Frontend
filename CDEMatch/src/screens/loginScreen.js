@@ -56,6 +56,10 @@ export default function LoginScreen({ navigation }) {
       });
   };
 
+  const handleForgotPassword = () => {
+    navigation.navigate("ForgotPassword");
+  };
+
   return (
     <SafeAreaView style={loginStyle.container}>
       <KeyboardAvoidingView
@@ -101,7 +105,7 @@ export default function LoginScreen({ navigation }) {
               )}
             </TouchableOpacity>
 
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleForgotPassword}>
               <Text style={loginStyle.forgotPassword}>Esqueci-me da senha</Text>
             </TouchableOpacity>
           </View>

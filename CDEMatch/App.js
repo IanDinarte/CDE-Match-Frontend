@@ -16,6 +16,8 @@ import { navigationRef } from "./src/services/navigationRef.js";
 // importar screens da app
 import LoginScreen from "./src/screens/loginScreen.js";
 import TabNavigator from "./src/routes/tabNavigator.js";
+import ForgotPassScreen from "./src/screens/forgotPass.js";
+import ResetPasswordScreen from "./src/screens/resetPass.js";
 import { colors } from "./src/styles/colors.js";
 
 const Stack = createStackNavigator();
@@ -26,6 +28,8 @@ const linkingConfig = {
     path: "cdematch",
     screens: {
       Login: "",
+      ForgotPassword: "",
+      ResetPassword: "",
       MainApp: {
         path: "",
         screens: {
@@ -96,6 +100,8 @@ export default function App() {
               screenOptions={{ headerShown: false }}
             >
               <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="ForgotPassword" component={ForgotPassScreen} />
+              <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
               <Stack.Screen name="MainApp" component={TabNavigator} />
             </Stack.Navigator>
           </NavigationContainer>
